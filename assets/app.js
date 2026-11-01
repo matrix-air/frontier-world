@@ -1,4 +1,4 @@
-/* MicroDuck复刻营 · 前端应用 v3（hash 路由 SPA）
+/* MicroDuck 造物世界 · 前端应用 v3（hash 路由 SPA）
  * 路由：#/ 首页（隐藏 #app-view 显示静态内容）、#/test 段位测试（33 题分支问卷 v1.1.0）、
  *       #/growth 成长体系、#/map 作战图谱、#/camp 三轨营+报名、#/open 开源内核、
  *       #/activities 活动、#/library 内容库、#/library/:id 文章详情、#/pledge 十方共赢、#/admin 管理指南。
@@ -587,7 +587,7 @@
     ctx.font = '700 21px IBMPlexMono, monospace';
     ctx.textAlign = 'left';
     ctx.textBaseline = 'middle';
-    ctx.fillText('MICRODUCK REPLICA CAMP', 84, 63);
+    ctx.fillText('MICRODUCK MAKER WORLD', 84, 63);
 
     /* Duck 编号 */
     ctx.fillStyle = DUCK;
@@ -652,7 +652,7 @@
     ctx.fillStyle = 'rgba(245,241,232,0.72)';
     ctx.font = '400 14px -apple-system, PingFang SC, sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText('MicroDuck复刻营 · 段位测试 v1.1.0', 300, 772);
+    ctx.fillText('MicroDuck 造物世界 · 段位测试 v1.1.0', 300, 772);
     ctx.fillStyle = 'rgba(245,241,232,0.5)';
     ctx.font = '400 12px -apple-system, PingFang SC, sans-serif';
     ctx.textAlign = 'right';
@@ -1248,7 +1248,7 @@
     }
     appView.innerHTML =
       '<section class="page"><div class="wrap">' +
-        pageHead('FOUNDING MEMO', '愿景与合作', '这份筹备计划书是 MicroDuck复刻营的起点。我们构建的是一套新体系，回应一个社会化问题：市场就业困难，AI 冲击就业。') +
+        pageHead('FOUNDING MEMO', '愿景与合作', '这份筹备计划书是 MicroDuck 造物世界的起点。我们构建的是一套新体系，回应一个社会化问题：市场就业困难，AI 冲击就业。') +
         '<div class="v-grid3">' + triHtml + '</div>' +
         '<div class="dim-line"></div>' +
         '<div class="seal-block"><span class="seal-stamp">目标</span>' +

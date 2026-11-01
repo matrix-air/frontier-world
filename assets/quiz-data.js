@@ -1,4 +1,4 @@
-/* MicroDuck复刻营 · 段位测试题库（问卷全文 v1.1.0 · 33 题逐字转录）
+/* MicroDuck 造物世界 · 段位测试题库（问卷全文 v1.1.0 · 33 题逐字转录）
  * 源文件：/Users/start-h/Documents/Aurora/microduck-survey/docs/问卷全文-v1.1.0.docx
  * 结构：单选 20 · 多选 4 · 多选限 3 项 4 · 开放填空 3 · 分值题 1 · 价格四格 1
  * 分支：按身份自动分支（显示条件函数），实际作答 14–27 题（问卷自述 16–26，见 tools/quiz-branch-test.js 实测）。

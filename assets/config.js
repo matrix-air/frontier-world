@@ -1,4 +1,4 @@
-/* MicroDuck复刻营 · 站点配置
+/* MicroDuck 造物世界 · 站点配置
  * SUPABASE.url 与 anonKey 都填上 = 正式模式（数据读写 Supabase；建库脚本 sql/schema.sql）；
  * 任一留空 = 演示模式（数据读写本机 localStorage，仅供本地预览）。
  * url 形如 "https://xxxx.supabase.co"（项目 Settings → API → Project URL）；

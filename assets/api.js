@@ -1,4 +1,4 @@
-/* MicroDuck复刻营 · 数据适配层（v3）
+/* MicroDuck 造物世界 · 数据适配层（v3）
  * live 模式：FW_CONFIG.SUPABASE 的 url + anonKey 均非空 → 直连 Supabase REST（PostgREST），纯 fetch 零 SDK；
  *           建库与安全策略见 sql/schema.sql（v2 既有表）与 sql/v3-migration.sql（survey_responses / camp_applications 新表）。
  * demo 模式：url 或 anonKey 为空 → 读写 localStorage（键前缀 md-demo-*），内置种子数据，刷新后仍在。
@@ -112,7 +112,7 @@
         id: 'post-log-duck-walk',
         track: 'log',
         title: '复刻者日志：从乱蹬到站起来，一只鸭子的 18.4 小时',
-        author: '复刻营 · 实训组',
+        author: '造物世界 · 实训组',
         date: '2026-10-29',
         summary: '一台无 CUDA 的笔记本，256 个并行环境，18.4 小时：mean_reward 从 −0.20 乱蹬到 +13.74 会走，回合长度从 18 步涨到 275 步。这是养成系叙事的真实训练曲线。',
         body: '这篇日志记录一次本机复刻实验：Apple M5 Pro，无 CUDA，纯 CPU 训练。\n\n第一步是信任官方仓库：149 项 CPU 测试全部通过，ONNX 导出 793KB，部署契约 obs[1,61]→act[1,14] 校验通过，官方策略在仿真里实时走路——vx=0.25，10 秒走 1.09 米，零摔倒。\n\n然后开始自训。任务叫 LaptopClose：让鸭子用喙把一台笔记本的盖子合上。256 个并行环境，CPU 上跑了 18.4 小时、2030/4000 轮迭代：\n- mean_reward 从 −0.20（乱蹬）涨到 +13.74，峰值 +16.11；\n- 回合长度从 18 步涨到 275/300 步；\n- lid_hold_closed 达到 0.735/1.5——约一半时间盖子保持在离全闭 5° 以内。\n\n这就是训练营里学员会亲手走一遍的曲线：起步时乱蹬像笑话，站起来那一刻像奇迹。9 个 checkpoint 已归档，训练实录本身就是作业——产物即传播物，作业即广告。\n\n诚实备注：真步态训练需要 CUDA（三条路：HF Jobs / 租云 GPU / MJX 换框架慢训），营内主线 sim-only，真机部署是营后可选的 L3 关。'
