@@ -1,0 +1,485 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>全国分区作战地图 · MicroDuck复刻营</title>
+<style>
+:root {
+  /* 深色作战室（常驻，不随系统切浅色） */
+  --background: #16181d;
+  --foreground: #e8eaf0;
+  --card: #1f232b;
+  --muted: #2a2f38;
+  --muted-foreground: #9aa3b0;
+  --border: #333945;
+  --viz-series-1: #2563eb;
+  --viz-series-2: #ea580c;
+  --viz-series-3: #16a34a;
+  --viz-series-4: #9333ea;
+  --viz-series-5: #d97706;
+  --viz-series-6: #0891b2;
+}
+html, body { margin: 0; padding: 0; }
+body { padding: 18px 20px 26px; background: var(--background); color: var(--foreground);
+  font-family: -apple-system, "PingFang SC", sans-serif; font-size: 14px; }
+.map-head { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin: 0 0 14px; }
+.map-head h1 { font-size: 17px; font-weight: 600; margin: 0; letter-spacing: 1px; }
+.map-head .sub { font-size: 12px; color: var(--muted-foreground); }
+.map-sec-title { font-size: 12px; color: var(--muted-foreground); letter-spacing: 2px;
+  margin: 26px 0 10px; padding-top: 14px; border-top: 1px solid var(--border); }
+.map-sec-title:first-of-type { margin-top: 0; padding-top: 0; border-top: 0; }
+.viz-controls { display: flex; flex-wrap: wrap; gap: 6px 18px; margin: 0 0 10px; }
+.viz-controls label { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px;
+  color: var(--muted-foreground); cursor: pointer; user-select: none; }
+.viz-controls input[type="checkbox"] { accent-color: #0891b2; margin: 0; }
+.viz-controls .btn { font: inherit; font-size: 12.5px; padding: 4px 12px; border-radius: 7px;
+  border: 1px solid var(--border); background: var(--card); color: var(--foreground); }
+.viz-controls .btn:hover { border-color: #0891b2; }
+.viz-controls .btn[aria-pressed="true"] { border-color: #0891b2; color: #7dd3fc; }
+.map3d-wrap { perspective: 1400px; max-width: 860px; margin: 0 auto; }
+.map3d { position: relative; transform-style: preserve-3d; transition: transform .5s ease; }
+.map3d.tilted { transform: rotateX(50deg) rotateZ(-12deg); }
+.map3d svg { display: block; width: 100%; height: auto; }
+#trans-svg { position: absolute; inset: 0; width: 100%; height: 100%; transform: translateZ(55px); transition: transform .5s ease; }
+.map3d:not(.tilted) #trans-svg { transform: translateZ(0); }
+
+/* ---- 立体化增强（纯 SVG/CSS 实现，无 3D 渲染库） ---- */
+#map-svg { transform-style: preserve-3d; }
+/* 装饰层一律不吃指针事件，保证省份悬浮/tooltip 不被遮挡 */
+#stage-bg, #map-extrude, .prov-in, .gloss, .hub-pill, .hub-pulse, .hub-chip { pointer-events: none; }
+/* 高铁流动亮头：dash 周期 100（12+88），dashoffset 递减 = 沿路径正向流动 */
+.railflow { animation: railFlow 12s linear infinite; }
+@keyframes railFlow { from { stroke-dashoffset: 100; } to { stroke-dashoffset: 0; } }
+/* 枢纽脉冲环：r=5 起始放大到 2.4 倍并淡出，2.6s 循环，delay 各环错开 */
+.hub-pulse { transform-box: fill-box; transform-origin: center;
+  animation: hubPulse 2.6s ease-out infinite; opacity: 0; }
+@keyframes hubPulse {
+  0% { transform: scale(1); opacity: .85; }
+  70% { opacity: .3; }
+  100% { transform: scale(2.4); opacity: 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .railflow { animation: none; }
+  .hub-pulse { animation: none; opacity: 0; }
+}
+
+.legend { display: flex; flex-wrap: wrap; gap: 10px 18px; margin: 6px 0 2px; max-width: 860px; margin-left: auto; margin-right: auto; }
+.legend .li { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; color: var(--muted-foreground); }
+.legend .sw { width: 12px; height: 12px; border-radius: 3px; display: inline-block; }
+.legend .note { font-size: 11px; opacity: .85; }
+.footnote { margin: 8px auto 0; max-width: 860px; font-size: 11.5px; color: var(--muted-foreground); line-height: 1.7; }
+.prov:hover { filter: brightness(1.35); }
+</style>
+<script src="./vendor/d3.min.js"></script>
+</head>
+<body>
+<header class="map-head">
+  <h1>全国分区作战地图</h1>
+  <span class="sub">五大分区 · 首战 / P1 / P2 · 交通骨架为规划示意</span>
+</header>
+
+<div class="map-sec-title">2D · 全国分区作战图（可切图层 / 悬浮看分区）</div>
+<div class="viz-controls" id="layer-controls" aria-label="交通图层开关">
+  <label><input type="checkbox" id="ly-rail"><span>高铁干线</span></label>
+  <label><input type="checkbox" id="ly-road"><span>国道</span></label>
+  <label><input type="checkbox" id="ly-flight"><span>航空走廊</span></label>
+  <label><input type="checkbox" id="ly-city"><span>腹地节点</span></label>
+  <label><input type="checkbox" id="ly-tilt"><span>倾斜视角</span></label>
+</div>
+<div class="map3d-wrap"><div class="map3d" id="map3d">
+<svg id="map-svg" viewBox="0 0 760 664" role="img" aria-label="中国分区地图，七个中心城市"></svg>
+<svg id="trans-svg" viewBox="0 0 760 664" aria-hidden="true"></svg>
+</div></div>
+<div id="map-legend" class="legend"></div>
+<p class="footnote">底图来源：DataV.GeoAtlas 省界（简化）。福建归广州群（P1）、河南归太原方向（P2）；港澳台暂未规划。交通线为骨架级示意（高铁按主要经停站连线），非精确线路。</p>
+
+<script src="./vendor/china-geojson.js"></script>
+<script>
+const GROUPS = [
+  { n: "西南群·成都", cov: "云贵川藏渝", p: "首战" },
+  { n: "华南华中群·广州", cov: "珠三角+两湖两广海南+闽", p: "P1" },
+  { n: "长三角群·杭州", cov: "沪苏浙皖", p: "首战" },
+  { n: "华北东北群·天津/太原", cov: "京津冀+东北+山东+苏北+晋蒙+豫", p: "P1/P2" },
+  { n: "西北群·西安", cov: "陕甘宁青新", p: "P2" }
+];
+const PROV = {
+  "四川省":0,"重庆市":0,"云南省":0,"贵州省":0,"西藏自治区":0,
+  "广东省":1,"广西壮族自治区":1,"海南省":1,"湖南省":1,"湖北省":1,"江西省":1,"福建省":1,
+  "上海市":2,"江苏省":2,"浙江省":2,"安徽省":2,
+  "北京市":3,"天津市":3,"河北省":3,"山西省":3,"内蒙古自治区":3,"辽宁省":3,"吉林省":3,"黑龙江省":3,"山东省":3,
+  "陕西省":4,"甘肃省":4,"宁夏回族自治区":4,"青海省":4,"新疆维吾尔自治区":4,
+  "河南省":3,"台湾省":-1,"香港特别行政区":-1,"澳门特别行政区":-1
+};
+const HUBS = [
+  { n: "成都", lon: 104.06, lat: 30.57, tag: "首战", g: 0 },
+  { n: "杭州", lon: 120.15, lat: 30.27, tag: "首战", g: 2 },
+  { n: "广州", lon: 113.26, lat: 23.13, tag: "P1", g: 1 },
+  { n: "天津", lon: 117.20, lat: 39.08, tag: "P1", g: 3 },
+  { n: "西安", lon: 108.94, lat: 34.34, tag: "P2", g: 4 },
+  { n: "太原", lon: 112.55, lat: 37.87, tag: "P2", g: 3 },
+  { n: "青岛", lon: 120.38, lat: 36.06, tag: "P1-P2", g: 3 }
+];
+const RAILS = [
+  { name: "京广高铁", pts: [[116.41,39.90],[114.51,38.04],[113.63,34.75],[114.31,30.59],[112.94,28.23],[113.26,23.13]] },
+  { name: "京沪高铁", pts: [[116.41,39.90],[117.20,39.08],[117.12,36.65],[118.80,32.06],[121.47,31.23]] },
+  { name: "沪昆高铁", pts: [[121.47,31.23],[120.15,30.27],[115.89,28.68],[112.94,28.23],[106.63,26.65],[102.83,24.88]] },
+  { name: "沿江通道", pts: [[121.47,31.23],[118.80,32.06],[117.28,31.86],[114.31,30.59],[106.55,29.56],[104.06,30.57]] },
+  { name: "陆桥通道", pts: [[117.28,34.26],[113.63,34.75],[108.94,34.34],[103.83,36.06]] },
+  { name: "贵广高铁", pts: [[106.63,26.65],[110.29,25.27],[113.26,23.13]] },
+  { name: "兰新高铁", pts: [[103.83,36.06],[101.78,36.62],[87.62,43.82]] },
+  { name: "青银+大西通道", pts: [[120.38,36.06],[117.12,36.65],[114.51,38.04],[112.55,37.87],[108.94,34.34]] },
+  { name: "哈大高铁", pts: [[126.63,45.75],[125.32,43.90],[123.43,41.80],[121.61,38.91]] },
+  { name: "京哈高铁", pts: [[116.41,39.90],[123.43,41.80],[125.32,43.90],[126.63,45.75]] },
+  { name: "成昆通道", pts: [[104.06,30.57],[102.83,24.88]] }
+];
+const ROADS = [
+  { name: "G318 沪聂线（川藏段）", pts: [[121.47,31.23],[117.05,30.51],[114.31,30.59],[111.29,30.69],[109.49,30.27],[104.06,30.57],[103.04,29.98],[94.36,29.65],[91.11,29.66]] },
+  { name: "G108 京昆线", pts: [[116.41,39.90],[114.51,38.04],[112.55,37.87],[108.94,34.34],[104.06,30.57],[102.83,24.88]] }
+];
+const FLIGHTS = [
+  { name: "哈尔滨—广州", pts: [[126.63,45.75],[113.26,23.13]] },
+  { name: "乌鲁木齐—上海", pts: [[87.62,43.82],[121.47,31.23]] },
+  { name: "拉萨—北京", pts: [[91.11,29.66],[116.41,39.90]] }
+];
+const CITIES = [
+  { name: "石家庄", pts: [[114.51,38.04]] }, { name: "郑州", pts: [[113.63,34.75]] },
+  { name: "武汉", pts: [[114.31,30.59]] }, { name: "长沙", pts: [[112.94,28.23]] },
+  { name: "济南", pts: [[117.12,36.65]] }, { name: "南京", pts: [[118.80,32.06]] },
+  { name: "合肥", pts: [[117.28,31.86]] }, { name: "南昌", pts: [[115.89,28.68]] },
+  { name: "贵阳", pts: [[106.63,26.65]] }, { name: "昆明", pts: [[102.83,24.88]] },
+  { name: "重庆", pts: [[106.55,29.56]] }, { name: "兰州", pts: [[103.83,36.06]] },
+  { name: "西宁", pts: [[101.78,36.62]] }, { name: "乌鲁木齐", pts: [[87.62,43.82]] },
+  { name: "哈尔滨", pts: [[126.63,45.75]] }, { name: "沈阳", pts: [[123.43,41.80]] },
+  { name: "大连", pts: [[121.61,38.91]] }, { name: "徐州", pts: [[117.28,34.26]] },
+  { name: "拉萨", pts: [[91.11,29.66]] }, { name: "桂林", pts: [[110.29,25.27]] }
+];
+const GEO = window.CHINA_GEO;
+</script>
+<script>
+(function () {
+  const svg = d3.select("#map-svg");
+  const W = 760, H = 620;           /* 制图区仍为 760x620（y 10..610），viewBox 底部加厚到 664 容纳挤出+阴影 */
+  const mainland = GEO.features.filter(f => f.properties.adcode !== "100000_JD");
+  const merc = d => Math.log(Math.tan(Math.PI / 4 + d * Math.PI / 360));
+  const L0 = 73, L1 = 135, B0 = 18, B1 = 53.5;
+  const MSPAN = merc(B1) - merc(B0);
+  const proj = p => [10 + (p[0] - L0) / (L1 - L0) * (W - 20),
+    10 + (merc(B1) - merc(p[1])) / MSPAN * (H - 20)];
+  const path = d3.geoPath(d3.geoTransform({ point: function(lon, lat) { const q = proj([lon, lat]); this.stream.point(q[0], q[1]); } }));
+  const series = ["--viz-series-1", "--viz-series-2", "--viz-series-3", "--viz-series-4", "--viz-series-5"];
+
+  /* ---- 颜色工具（全部确定性，无运行期随机数） ---- */
+  const rootStyle = getComputedStyle(document.documentElement);
+  const HEX = series.map(v => (rootStyle.getPropertyValue(v) || "").trim() || "#0891b2");
+  function shade(hex, k) {           /* k=0 原色，k=1 全黑 */
+    const n = parseInt(hex.slice(1), 16);
+    const r = Math.round(((n >> 16) & 255) * (1 - k)),
+          g = Math.round(((n >> 8) & 255) * (1 - k)),
+          b = Math.round((n & 255) * (1 - k));
+    return "rgb(" + r + "," + g + "," + b + ")";
+  }
+  function lerpRGB(a, b, t) {
+    const pa = [parseInt(a.slice(1, 3), 16), parseInt(a.slice(3, 5), 16), parseInt(a.slice(5, 7), 16)];
+    const pb = [parseInt(b.slice(1, 3), 16), parseInt(b.slice(3, 5), 16), parseInt(b.slice(5, 7), 16)];
+    return "rgb(" + [0, 1, 2].map(i => Math.round(pa[i] + (pb[i] - pa[i]) * t)).join(",") + ")";
+  }
+  function mulberry32(seed) {        /* 固定 seed，星点每次渲染一致 */
+    let a = seed >>> 0;
+    return function () {
+      a = (a + 0x6D2B79F5) | 0;
+      let t = Math.imul(a ^ (a >>> 15), 1 | a);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+  /* 卫兵：手机宽 iframe（390px）挤出层数减半；reduced-motion 由 CSS 媒体查询兜底 */
+  const NARROW = window.matchMedia && window.matchMedia("(max-width: 390px)").matches;
+  const EXT_N = NARROW ? 4 : 8;
+
+  const provD = GEO.features.map(f => path(f));
+
+  /* ================= defs：渐变 / 滤镜 / 复用母版 / 裁剪 ================= */
+  const defs = svg.append("defs");
+  /* 五分区顶面渐变：分区色 → 加深 45%，自上而下 */
+  HEX.forEach((hex, i) => {
+    const g = defs.append("linearGradient").attr("id", "gfill-" + i)
+      .attr("x1", 0).attr("y1", 0).attr("x2", 0).attr("y2", 1);
+    g.append("stop").attr("offset", "0%").attr("stop-color", hex);
+    g.append("stop").attr("offset", "100%").attr("stop-color", shade(hex, 0.45));
+  });
+  /* 枢纽光柱渐变：分区色（底）→ 透明（顶），用于 objectBoundingBox 的竖 rect */
+  HEX.forEach((hex, i) => {
+    const g = defs.append("linearGradient").attr("id", "pillar-g" + i)
+      .attr("x1", 0).attr("y1", 1).attr("x2", 0).attr("y2", 0);
+    g.append("stop").attr("offset", "0%").attr("stop-color", hex).attr("stop-opacity", 0.95);
+    g.append("stop").attr("offset", "100%").attr("stop-color", hex).attr("stop-opacity", 0);
+  });
+  /* 舞台辉光：深蓝径向 → 透明 */
+  const glow = defs.append("radialGradient").attr("id", "stage-glow");
+  glow.append("stop").attr("offset", "0%").attr("stop-color", "#0d1b3d").attr("stop-opacity", 0.95);
+  glow.append("stop").attr("offset", "55%").attr("stop-color", "#0d1b3d").attr("stop-opacity", 0.55);
+  glow.append("stop").attr("offset", "100%").attr("stop-color", "#0d1b3d").attr("stop-opacity", 0);
+  /* 顶面光泽：白 4% → 0，自上而下 */
+  const gloss = defs.append("linearGradient").attr("id", "gloss-grad")
+    .attr("x1", 0).attr("y1", 0).attr("x2", 0).attr("y2", 1);
+  gloss.append("stop").attr("offset", "0%").attr("stop-color", "#ffffff").attr("stop-opacity", 0.04);
+  gloss.append("stop").attr("offset", "100%").attr("stop-color", "#ffffff").attr("stop-opacity", 0);
+  /* 顶面落影：向下 12px、模糊、黑 45%（仅 feDropShadow，无重滤镜） */
+  const fsh = defs.append("filter").attr("id", "top-shadow")
+    .attr("x", "-15%").attr("y", "-15%").attr("width", "130%").attr("height", "135%");
+  fsh.append("feDropShadow").attr("dx", 0).attr("dy", 12)
+    .attr("stdDeviation", 9).attr("flood-color", "#000000").attr("flood-opacity", 0.45);
+  /* 挤出复用母版：全部省界 path（不含样式，由 use 继承填充） */
+  const master = defs.append("g").attr("id", "geo-master");
+  master.selectAll("path").data(provD).join("path").attr("d", d => d);
+  /* 顶面光泽裁剪：与地图外廓一致 */
+  const clip = defs.append("clipPath").attr("id", "map-clip");
+  clip.selectAll("path").data(provD).join("path").attr("d", d => d);
+
+  /* ================= 舞台背景：辉光 + 经纬网格 + 星点 ================= */
+  const bg = svg.append("g").attr("id", "stage-bg");
+  bg.append("ellipse").attr("cx", 380).attr("cy", 316).attr("rx", 372).attr("ry", 300)
+    .attr("fill", "url(#stage-glow)");
+  let gridD = "";
+  for (let x = 40; x < W; x += 40) gridD += "M" + x + ",0V" + (H + 44);
+  for (let y = 40; y < H + 44; y += 40) gridD += "M0," + y + "H" + W;
+  bg.append("path").attr("d", gridD).attr("fill", "none")
+    .attr("stroke", "rgba(148,166,204,.05)").attr("stroke-width", 1);
+  const rnd = mulberry32(20261101);
+  for (let i = 0; i < 40; i++) {
+    bg.append("circle").attr("class", "star")
+      .attr("cx", +(rnd() * W).toFixed(1)).attr("cy", +(rnd() * (H + 40)).toFixed(1))
+      .attr("r", (0.6 + rnd() * 0.8).toFixed(2))
+      .attr("fill", "#ffffff").attr("opacity", (0.08 + rnd() * 0.17).toFixed(3));
+  }
+
+  /* ================= 挤出层：8 层（窄屏 4 层）板块厚度 ================= */
+  const ext = svg.append("g").attr("id", "map-extrude");
+  for (let i = EXT_N; i >= 1; i--) {           /* 最深一层最先画 */
+    const t = EXT_N === 1 ? 0 : (i - 1) / (EXT_N - 1);
+    const g = ext.append("g").attr("class", "ext-layer")
+      .attr("transform", "translate(0," + (i * 3.5) + ")")                       /* 兜底：attribute 平移 */
+      .style("transform", "translate3d(0px," + (i * 3.5) + "px," + (-(i * 5)) + "px)"); /* 倾斜视角下的视差位 */
+    g.append("use").attr("href", "#geo-master").attr("xlink:href", "#geo-master")
+      .attr("fill", lerpRGB("#101b33", "#05070f", t))
+      .attr("fill-opacity", (0.92 - t * 0.34).toFixed(3))
+      .attr("stroke", lerpRGB("#101b33", "#05070f", t))
+      .attr("stroke-width", 0.6);
+  }
+
+  /* ================= 顶面：分区渐变 + 双描边 + 光泽 + 落影 ================= */
+  const top = svg.append("g").attr("id", "map-top").attr("filter", "url(#top-shadow)");
+  top.selectAll("path.prov").data(GEO.features).join("path")
+    .attr("class", "prov")
+    .attr("d", d => path(d))
+    .attr("fill", d => {
+      const gi = PROV[d.properties.name];
+      if (gi === -1 || gi === -2) return "var(--muted)";
+      return "url(#gfill-" + gi + ")";
+    })
+    .attr("fill-opacity", d => (PROV[d.properties.name] >= 0 ? 0.8 : 0.35))
+    .attr("stroke", "#0b1120")
+    .attr("stroke-width", 0.7)
+    .attr("data-tooltip", d => {
+      const gi = PROV[d.properties.name];
+      if (gi === undefined) return d.properties.name + "（暂未规划）";
+      if (gi === -2) return "河南·十字路口：豫北→天津 豫西→西安 豫东→杭州 豫南→广州";
+      if (gi === -1) return d.properties.name + "（暂未规划）";
+      const g = GROUPS[gi];
+      return g.p + "·" + g.n + "：" + g.cov;
+    });
+  /* 内层亮描边（叠在填充之上，不吃指针） */
+  top.selectAll("path.prov-in").data(GEO.features).join("path")
+    .attr("class", "prov-in")
+    .attr("d", d => path(d))
+    .attr("fill", "none")
+    .attr("stroke", "rgba(125,211,252,.25)")
+    .attr("stroke-width", 0.5);
+  /* 顶面自上而下光泽（裁剪在地图外廓内） */
+  top.append("rect").attr("class", "gloss")
+    .attr("x", 10).attr("y", 10).attr("width", W - 20).attr("height", H - 20)
+    .attr("fill", "url(#gloss-grad)").attr("clip-path", "url(#map-clip)");
+
+  /* ================= 枢纽：光柱 + 脉冲环 + 光点 + 芯片标签 ================= */
+  const meas = document.createElement("canvas").getContext("2d");
+  meas.font = "600 12px -apple-system, 'PingFang SC', sans-serif";
+  const hubPt = h => proj([h.lon, h.lat]);
+  const hubG = svg.append("g").attr("id", "map-hubs");
+  HUBS.forEach((h, i) => {
+    const p = hubPt(h), col = HEX[h.g];
+    /* 竖向光柱：从点向上 16px，宽 3px，分区色 → 透明 */
+    hubG.append("rect").attr("class", "hub-pill")
+      .attr("x", p[0] - 1.5).attr("y", p[1] - 16).attr("width", 3).attr("height", 16)
+      .attr("rx", 1.5).attr("fill", "url(#pillar-g" + h.g + ")");
+    /* 脉冲环：r=5 → 2.4 倍淡出，delay 错开 */
+    hubG.append("circle").attr("class", "hub-pulse")
+      .attr("cx", p[0]).attr("cy", p[1]).attr("r", 5)
+      .attr("fill", "none").attr("stroke", col).attr("stroke-width", 1.5)
+      .style("animation-delay", (-(i * 0.37) % 2.6).toFixed(2) + "s");
+  });
+  svg.selectAll("circle.hub").data(HUBS).join("circle")
+    .attr("class", "hub")
+    .attr("cx", d => hubPt(d)[0])
+    .attr("cy", d => hubPt(d)[1])
+    .attr("r", 5)
+    .attr("fill", "var(--foreground)")
+    .attr("stroke", "var(--background)")
+    .attr("stroke-width", 1.5)
+    .attr("data-tooltip", d => d.n + " · " + d.tag);
+  /* 芯片标签：圆角底 rect（#0d1220 80% + 1px 分区色边）+ 文本 */
+  HUBS.forEach((h, i) => {
+    const p = hubPt(h), col = HEX[h.g];
+    const label = h.n + "·" + h.tag;
+    const tw = meas.measureText(label).width;
+    const cg = svg.append("g").attr("class", "hub-chip");
+    cg.append("rect")
+      .attr("x", p[0] + 8).attr("y", p[1] - 10.5)
+      .attr("width", (tw + 12).toFixed(1)).attr("height", 19).attr("rx", 5)
+      .attr("fill", "rgba(13,18,32,0.8)")
+      .attr("stroke", col).attr("stroke-opacity", 0.6).attr("stroke-width", 1);
+    cg.append("text").attr("class", "hublab")
+      .attr("x", p[0] + 14).attr("y", p[1] + 4)
+      .text(label)
+      .attr("font-size", 12).attr("font-weight", 600)
+      .attr("fill", "var(--foreground)");
+  });
+
+  /* ================= 图例 ================= */
+  const lg = d3.select("#map-legend");
+  GROUPS.forEach((g, i) => {
+    lg.append("span").attr("class", "li")
+      .html('<span class="sw" style="background:var(' + series[i] + ')"></span>' + g.n);
+  });
+  lg.append("span").attr("class", "li").html('<svg width="22" height="10"><line x1="0" y1="5" x2="22" y2="5" stroke="var(--viz-series-6)" stroke-width="2"/></svg>高铁干线');
+  lg.append("span").attr("class", "li").html('<svg width="22" height="10"><line x1="0" y1="5" x2="22" y2="5" stroke="var(--muted-foreground)" stroke-width="1.3" stroke-dasharray="4 3"/></svg>国道（示意）');
+  lg.append("span").attr("class", "li").html('<svg width="22" height="10"><path d="M0,8 Q11,0 22,8" fill="none" stroke="var(--muted-foreground)" stroke-width="1.1" stroke-dasharray="3 2"/></svg>航空走廊');
+  lg.append("span").attr("class", "li note").text("光带=在途干线 · 光柱=枢纽");
+
+  /* ================= 交通层（trans-svg 浮动平面） ================= */
+  const tsvg = d3.select("#trans-svg");
+  const line = d3.line();
+  const drawL = pts => line(pts.map(proj));
+  /* 高铁三笔：辉光层 → 基线 → 流动亮头（辉光/亮头不吃指针，tooltip 留在基线） */
+  tsvg.selectAll("path.railglow").data(RAILS).join("path")
+    .attr("class", "railglow")
+    .attr("d", d => drawL(d.pts))
+    .attr("fill", "none")
+    .attr("stroke", "#7dd3fc")
+    .attr("stroke-width", 6)
+    .attr("stroke-opacity", 0.15)
+    .attr("stroke-linejoin", "round")
+    .attr("stroke-linecap", "round");
+  tsvg.selectAll("path.rail").data(RAILS).join("path")
+    .attr("class", "rail")
+    .attr("d", d => drawL(d.pts))
+    .attr("fill", "none")
+    .attr("stroke", "var(--viz-series-6)")
+    .attr("stroke-width", 1.5)
+    .attr("stroke-opacity", 0.8)
+    .attr("stroke-linejoin", "round")
+    .attr("data-tooltip", d => "高铁：" + d.name);
+  const railRnd = mulberry32(20261102);
+  tsvg.selectAll("path.railflow").data(RAILS).join("path")
+    .attr("class", "railflow")
+    .attr("d", d => drawL(d.pts))
+    .attr("fill", "none")
+    .attr("stroke", "#7dd3fc")
+    .attr("stroke-width", 1.2)
+    .attr("stroke-linecap", "round")
+    .attr("stroke-dasharray", "12 88")
+    .style("animation-delay", function (d, i) { return (-(railRnd() * 12)).toFixed(2) + "s"; });
+  tsvg.selectAll("path.road").data(ROADS).join("path")
+    .attr("class", "road")
+    .attr("d", d => drawL(d.pts))
+    .attr("fill", "none")
+    .attr("stroke", "var(--muted-foreground)")
+    .attr("stroke-width", 1.1)
+    .attr("stroke-dasharray", "4 3")
+    .attr("data-tooltip", d => "国道：" + d.name);
+  tsvg.selectAll("path.flight").data(FLIGHTS).join("path")
+    .attr("class", "flight")
+    .attr("d", d => {
+      const a = proj(d.pts[0]), b = proj(d.pts[1]);
+      const mx = (a[0] + b[0]) / 2, my = (a[1] + b[1]) / 2 - Math.hypot(b[0] - a[0], b[1] - a[1]) * 0.16;
+      return "M" + a[0] + "," + a[1] + " Q" + mx + "," + my + " " + b[0] + "," + b[1];
+    })
+    .attr("fill", "none")
+    .attr("stroke", "var(--muted-foreground)")
+    .attr("stroke-width", 1)
+    .attr("stroke-dasharray", "3 2")
+    .attr("data-tooltip", d => "航线：" + d.name);
+  tsvg.selectAll("circle.city").data(CITIES).join("circle")
+    .attr("class", "city")
+    .attr("cx", d => proj(d.pts[0])[0])
+    .attr("cy", d => proj(d.pts[0])[1])
+    .attr("r", 2.2)
+    .attr("fill", "var(--background)")
+    .attr("stroke", "var(--foreground)")
+    .attr("stroke-width", 1)
+    .attr("data-tooltip", d => d.name + "·交通节点");
+
+  /* ================= 图层开关 / 倾斜视角 / 状态持久化 ================= */
+  const tsel = s => document.querySelector(s);
+  const layers = [
+    ["ly-rail", "path.rail, path.railglow, path.railflow"],
+    ["ly-road", "path.road"],
+    ["ly-flight", "path.flight"],
+    ["ly-city", "circle.city"]
+  ];
+  function applyL() {
+    layers.forEach(([id, sel]) => {
+      tsvg.selectAll(sel).attr("display", tsel("#" + id).checked ? null : "none");
+    });
+    const t3 = tsel("#ly-tilt").checked;
+    document.getElementById("map3d").classList.toggle("tilted", t3);
+    if (window.zcode && window.zcode.setWidgetState) {
+      const o = {};
+      layers.forEach(([id]) => { o[id.slice(3)] = tsel("#" + id).checked; });
+      o.tilt = t3;
+      window.zcode.setWidgetState({ modelContent: { l: o } }).catch(() => {});
+    }
+  }
+  layers.forEach(([id]) => tsel("#" + id).addEventListener("change", applyL));
+  tsel("#ly-tilt").addEventListener("change", applyL);
+  const saved = (window.zcode && window.zcode.widgetState && window.zcode.widgetState.modelContent) || null;
+  if (saved && saved.l) {
+    layers.forEach(([id]) => { if (typeof saved.l[id.slice(3)] === "boolean") tsel("#" + id).checked = saved.l[id.slice(3)]; });
+    if (typeof saved.l.tilt === "boolean") tsel("#ly-tilt").checked = saved.l.tilt;
+  }
+  document.addEventListener("zcode:set_globals", e => {
+    const m = e.detail && e.detail.globals && e.detail.globals.widgetState;
+    if (m && m.l) {
+      layers.forEach(([id]) => { if (typeof m.l[id.slice(3)] === "boolean") tsel("#" + id).checked = m.l[id.slice(3)]; });
+      if (typeof m.l.tilt === "boolean") tsel("#ly-tilt").checked = m.l.tilt;
+      applyL();
+    }
+  });
+  applyL();
+
+  /* ================= 悬停聚焦（高铁线 + 辉光/亮头联动变暗） ================= */
+  function focusRails(fn) {
+    tsvg.selectAll("path.rail").attr("stroke-opacity", d => fn(d) ? 1 : 0.15)
+      .attr("stroke-width", d => fn(d) ? 2.4 : 1.2);
+    tsvg.selectAll("path.railglow, path.railflow")
+      .attr("opacity", d => fn(d) ? null : 0.08);
+  }
+  function clearF() {
+    tsvg.selectAll("path.rail").attr("stroke-opacity", 0.8).attr("stroke-width", 1.5);
+    tsvg.selectAll("path.railglow").attr("opacity", null);
+    tsvg.selectAll("path.railflow").attr("opacity", null);
+  }
+  const hasPt = (pts, c) => pts.some(p => p[0] === c[0] && p[1] === c[1]);
+  tsvg.selectAll("path.rail")
+    .on("mouseover", (e, d) => focusRails(x => x === d))
+    .on("mouseout", clearF);
+  d3.select("#map-svg").selectAll("circle.hub")
+    .on("mouseover", (e, d) => focusRails(r => hasPt(r.pts, [d.lon, d.lat])))
+    .on("mouseout", clearF);
+  tsvg.selectAll("circle.city")
+    .on("mouseover", (e, d) => focusRails(r => hasPt(r.pts, d.pts[0])))
+    .on("mouseout", clearF);
+})();
+</script>
+</body>
+</html>
