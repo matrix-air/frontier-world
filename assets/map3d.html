@@ -47,10 +47,11 @@ body { padding: 18px 20px 26px; background: var(--background); color: var(--fore
 /* ---- 立体化增强（纯 SVG/CSS 实现，无 3D 渲染库） ---- */
 #map-svg { transform-style: preserve-3d; }
 /* 装饰层一律不吃指针事件，保证省份悬浮/tooltip 不被遮挡 */
-#stage-bg, #map-extrude, .prov-in, .gloss, .hub-pill, .hub-pulse, .hub-chip { pointer-events: none; }
-/* 高铁流动亮头：dash 周期 100（12+88），dashoffset 递减 = 沿路径正向流动 */
-.railflow { animation: railFlow 12s linear infinite; }
-@keyframes railFlow { from { stroke-dashoffset: 100; } to { stroke-dashoffset: 0; } }
+#stage-bg, #map-extrude, .prov-in, .gloss, .hub-pill, .hub-pulse, .hub-chip, .flight-chip { pointer-events: none; }
+/* 高铁流动亮头：dash 周期固定 100（12+88）；每线内联注入 --ro（偏移总量=路径长向上取整到周期倍数，
+   循环无跳变）与 --rd（=偏移/26s）→ 全网统一 26px/s 匀速，时长随路径长度换算 */
+.railflow { animation: railFlow var(--rd, 12s) linear infinite; }
+@keyframes railFlow { from { stroke-dashoffset: var(--ro, 100); } to { stroke-dashoffset: 0; } }
 /* 枢纽脉冲环：r=5 起始放大到 2.4 倍并淡出，2.6s 循环，delay 各环错开 */
 .hub-pulse { transform-box: fill-box; transform-origin: center;
   animation: hubPulse 2.6s ease-out infinite; opacity: 0; }
@@ -140,7 +141,9 @@ const ROADS = [
 const FLIGHTS = [
   { name: "哈尔滨—广州", pts: [[126.63,45.75],[113.26,23.13]] },
   { name: "乌鲁木齐—上海", pts: [[87.62,43.82],[121.47,31.23]] },
-  { name: "拉萨—北京", pts: [[91.11,29.66],[116.41,39.90]] }
+  { name: "拉萨—北京", pts: [[91.11,29.66],[116.41,39.90]] },
+  { name: "成都—天津", pts: [[104.06,30.57],[117.20,39.08]] },
+  { name: "成都—杭州", pts: [[104.06,30.57],[120.15,30.27]], gold: true }
 ];
 const CITIES = [
   { name: "石家庄", pts: [[114.51,38.04]] }, { name: "郑州", pts: [[113.63,34.75]] },
@@ -353,28 +356,33 @@ const GEO = window.CHINA_GEO;
   });
   lg.append("span").attr("class", "li").html('<svg width="22" height="10"><line x1="0" y1="5" x2="22" y2="5" stroke="var(--viz-series-6)" stroke-width="2"/></svg>高铁干线');
   lg.append("span").attr("class", "li").html('<svg width="22" height="10"><line x1="0" y1="5" x2="22" y2="5" stroke="var(--muted-foreground)" stroke-width="1.3" stroke-dasharray="4 3"/></svg>国道（示意）');
-  lg.append("span").attr("class", "li").html('<svg width="22" height="10"><path d="M0,8 Q11,0 22,8" fill="none" stroke="var(--muted-foreground)" stroke-width="1.1" stroke-dasharray="3 2"/></svg>航空走廊');
-  lg.append("span").attr("class", "li note").text("光带=在途干线 · 光柱=枢纽");
+  lg.append("span").attr("class", "li").html('<svg width="22" height="10"><path d="M0,8 Q11,0 22,8" fill="none" stroke="var(--muted-foreground)" stroke-width="1.1" stroke-dasharray="3 2"/></svg>航空走廊（✈ 在飞航班）');
+  lg.append("span").attr("class", "li").html('<svg width="22" height="10"><path d="M0,8 Q11,0 22,8" fill="none" stroke="#fcd34d" stroke-width="1.4"/></svg>首战专线（成都—杭州）');
+  lg.append("span").attr("class", "li note").text("光带=在途干线 · 光柱=枢纽 · 三角机=在飞");
 
   /* ================= 交通层（trans-svg 浮动平面） ================= */
   const tsvg = d3.select("#trans-svg");
   const line = d3.line();
   const drawL = pts => line(pts.map(proj));
-  /* 高铁三笔：辉光层 → 基线 → 流动亮头（辉光/亮头不吃指针，tooltip 留在基线） */
+  const hasPt = (pts, c) => pts.some(p => p[0] === c[0] && p[1] === c[1]);
+  const FIRST_CITIES = [[104.06, 30.57], [120.15, 30.27]];   /* 成都 / 杭州 */
+  const firstLine = d => FIRST_CITIES.some(c => hasPt(d.pts, c));
+  /* 高铁三笔：辉光层 → 基线 → 流动亮头（辉光/亮头不吃指针，tooltip 留在基线）；
+     首战城（成都/杭州）干线基线提亮 #a5e3ff、辉光 .22，其余保持原样 */
   tsvg.selectAll("path.railglow").data(RAILS).join("path")
     .attr("class", "railglow")
     .attr("d", d => drawL(d.pts))
     .attr("fill", "none")
     .attr("stroke", "#7dd3fc")
     .attr("stroke-width", 6)
-    .attr("stroke-opacity", 0.15)
+    .attr("stroke-opacity", d => firstLine(d) ? 0.22 : 0.15)
     .attr("stroke-linejoin", "round")
     .attr("stroke-linecap", "round");
   tsvg.selectAll("path.rail").data(RAILS).join("path")
     .attr("class", "rail")
     .attr("d", d => drawL(d.pts))
     .attr("fill", "none")
-    .attr("stroke", "var(--viz-series-6)")
+    .attr("stroke", d => firstLine(d) ? "#a5e3ff" : "var(--viz-series-6)")
     .attr("stroke-width", 1.5)
     .attr("stroke-opacity", 0.8)
     .attr("stroke-linejoin", "round")
@@ -388,7 +396,30 @@ const GEO = window.CHINA_GEO;
     .attr("stroke-width", 1.2)
     .attr("stroke-linecap", "round")
     .attr("stroke-dasharray", "12 88")
-    .style("animation-delay", function (d, i) { return (-(railRnd() * 12)).toFixed(2) + "s"; });
+    .each(function () {
+      /* 匀速光流：偏移总量 = 路径长向上取整到 dash 周期(100)整数倍（循环无跳变），
+         时长 = 偏移 / 26 → 每条线固定 26px/s；负 delay 错峰 */
+      const len = this.getTotalLength();
+      const delta = Math.ceil(len / 100) * 100;
+      const dur = delta / 26;
+      d3.select(this)
+        .style("--ro", delta.toFixed(0))
+        .style("--rd", dur.toFixed(2) + "s")
+        .style("animation-delay", (-(railRnd() * dur)).toFixed(2) + "s");
+    });
+  /* 经停站：各干线内部顶点（非首末端点），归 ly-rail 图层 */
+  const STOPS = [];
+  RAILS.forEach(r => r.pts.slice(1, -1).forEach(p => STOPS.push(p)));
+  tsvg.selectAll("circle.railstop").data(STOPS).join("circle")
+    .attr("class", "railstop")
+    .attr("cx", d => proj(d)[0])
+    .attr("cy", d => proj(d)[1])
+    .attr("r", 1.7)
+    .attr("fill", "var(--background)")
+    .attr("stroke", "var(--foreground)")
+    .attr("stroke-opacity", 0.9)
+    .attr("stroke-width", 1)
+    .attr("data-tooltip", "经停站");
   tsvg.selectAll("path.road").data(ROADS).join("path")
     .attr("class", "road")
     .attr("d", d => drawL(d.pts))
@@ -397,35 +428,119 @@ const GEO = window.CHINA_GEO;
     .attr("stroke-width", 1.1)
     .attr("stroke-dasharray", "4 3")
     .attr("data-tooltip", d => "国道：" + d.name);
-  tsvg.selectAll("path.flight").data(FLIGHTS).join("path")
+  /* 航空走廊：弧高按弦长比例换算（普通 0.16→0.10 随距离衰减，首战专线固定 0.18）；
+     描边用沿弦向的 userSpaceOnUse 渐变（两端淡出→中段 85%）；tooltip 改「在飞：XX—YY」 */
+  const REDUCED = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const FG = FLIGHTS.map(f => {
+    const a = proj(f.pts[0]), b = proj(f.pts[1]);
+    return { a: a, b: b, dist: Math.hypot(b[0] - a[0], b[1] - a[1]) };
+  });
+  const dmin = Math.min.apply(null, FG.map(g => g.dist));
+  const dmax = Math.max.apply(null, FG.map(g => g.dist));
+  const arcK = (f, i) => f.gold ? 0.18
+    : 0.16 - 0.06 * (dmax === dmin ? 0 : (FG[i].dist - dmin) / (dmax - dmin));
+  const arcM = (f, i) => {
+    const g = FG[i];
+    return [(g.a[0] + g.b[0]) / 2, (g.a[1] + g.b[1]) / 2 - g.dist * arcK(f, i)];
+  };
+  const flightD = (f, i) => {
+    const m = arcM(f, i);
+    return "M" + FG[i].a[0] + "," + FG[i].a[1] + " Q" + m[0] + "," + m[1] + " " + FG[i].b[0] + "," + FG[i].b[1];
+  };
+  /* 弧顶（二次贝塞尔 t=0.5：四分之一端点 + 一半控制点） */
+  const apex = i => {
+    const g = FG[i], m = arcM(FLIGHTS[i], i);
+    return [(g.a[0] + 2 * m[0] + g.b[0]) / 4, (g.a[1] + 2 * m[1] + g.b[1]) / 4];
+  };
+  const tdefs = tsvg.append("defs");
+  FLIGHTS.forEach((f, i) => {
+    const g = FG[i], col = f.gold ? "#fcd34d" : "#9aa3b0";
+    const fg = tdefs.append("linearGradient").attr("id", "fg-" + i)
+      .attr("gradientUnits", "userSpaceOnUse")
+      .attr("x1", g.a[0]).attr("y1", g.a[1]).attr("x2", g.b[0]).attr("y2", g.b[1]);
+    fg.append("stop").attr("offset", "0%").attr("stop-color", col).attr("stop-opacity", 0);
+    fg.append("stop").attr("offset", "50%").attr("stop-color", col).attr("stop-opacity", 0.85);
+    fg.append("stop").attr("offset", "100%").attr("stop-color", col).attr("stop-opacity", 0);
+  });
+  const flightNodes = tsvg.selectAll("path.flight").data(FLIGHTS).join("path")
     .attr("class", "flight")
-    .attr("d", d => {
-      const a = proj(d.pts[0]), b = proj(d.pts[1]);
-      const mx = (a[0] + b[0]) / 2, my = (a[1] + b[1]) / 2 - Math.hypot(b[0] - a[0], b[1] - a[1]) * 0.16;
-      return "M" + a[0] + "," + a[1] + " Q" + mx + "," + my + " " + b[0] + "," + b[1];
-    })
+    .attr("d", flightD)
     .attr("fill", "none")
-    .attr("stroke", "var(--muted-foreground)")
-    .attr("stroke-width", 1)
+    .attr("stroke", (d, i) => "url(#fg-" + i + ")")
+    .attr("stroke-width", d => d.gold ? 1.4 : 1)
     .attr("stroke-dasharray", "3 2")
-    .attr("data-tooltip", d => "航线：" + d.name);
-  tsvg.selectAll("circle.city").data(CITIES).join("circle")
+    .attr("data-tooltip", d => "在飞：" + d.name)
+    .nodes();
+  /* 在飞航班：每条走廊 1 架小三角机（≈7px），SMIL animateMotion rotate=auto 沿弧匀速飞行，
+     dur=弧长/45px/s、begin 负值错峰；reduced-motion 时改弧顶静态圆点（二选一创建） */
+  if (!REDUCED) {
+    tsvg.selectAll("g.plane").data(FLIGHTS).join("g")
+      .attr("class", "plane")
+      .attr("data-tooltip", d => "在飞：" + d.name)
+      .each(function (d, i) {
+        const len = flightNodes[i].getTotalLength(), dur = len / 45;
+        d3.select(this).append("path")
+          .attr("d", "M4,0 L-3,2.6 L-1.2,0 L-3,-2.6 Z")
+          .attr("fill", d.gold ? "#fcd34d" : "#9aa3b0")
+          .attr("stroke", "var(--background)")
+          .attr("stroke-width", 0.5);
+        d3.select(this).append("animateMotion")
+          .attr("dur", dur.toFixed(2) + "s")
+          .attr("begin", (-(i * dur / FLIGHTS.length)).toFixed(2) + "s")
+          .attr("repeatCount", "indefinite")
+          .attr("rotate", "auto")
+          .attr("path", flightNodes[i].getAttribute("d"));
+      });
+  } else {
+    tsvg.selectAll("circle.plane").data(FLIGHTS).join("circle")
+      .attr("class", "plane")
+      .attr("cx", (d, i) => apex(i)[0])
+      .attr("cy", (d, i) => apex(i)[1])
+      .attr("r", 2.2)
+      .attr("fill", d => d.gold ? "#fcd34d" : "#9aa3b0")
+      .attr("data-tooltip", d => "在飞：" + d.name);
+  }
+  /* 首战专线芯片标签：金色，置于中弧顶 */
+  FLIGHTS.forEach((f, i) => {
+    if (!f.gold) return;
+    const p = apex(i), label = "首战专线", tw = meas.measureText(label).width;
+    const cg = tsvg.append("g").attr("class", "flight-chip");
+    cg.append("rect")
+      .attr("x", p[0] + 6).attr("y", p[1] - 9)
+      .attr("width", (tw + 12).toFixed(1)).attr("height", 17).attr("rx", 5)
+      .attr("fill", "rgba(13,18,32,0.8)")
+      .attr("stroke", "#fcd34d").attr("stroke-opacity", 0.7).attr("stroke-width", 1);
+    cg.append("text")
+      .attr("x", p[0] + 12).attr("y", p[1] + 3.5)
+      .text(label)
+      .attr("font-size", 11).attr("font-weight", 600)
+      .attr("fill", "#fcd34d");
+  });
+  /* 腹地节点：站牌样式 = 外环（前景色描边 .8）+ 内点（前景色填充） */
+  const cityG = tsvg.selectAll("g.city").data(CITIES).join("g")
     .attr("class", "city")
+    .attr("data-tooltip", d => d.name + "·交通节点");
+  cityG.append("circle")
     .attr("cx", d => proj(d.pts[0])[0])
     .attr("cy", d => proj(d.pts[0])[1])
-    .attr("r", 2.2)
-    .attr("fill", "var(--background)")
+    .attr("r", 3.4)
+    .attr("fill", "none")
     .attr("stroke", "var(--foreground)")
-    .attr("stroke-width", 1)
-    .attr("data-tooltip", d => d.name + "·交通节点");
+    .attr("stroke-opacity", 0.8)
+    .attr("stroke-width", 1);
+  cityG.append("circle")
+    .attr("cx", d => proj(d.pts[0])[0])
+    .attr("cy", d => proj(d.pts[0])[1])
+    .attr("r", 1.4)
+    .attr("fill", "var(--foreground)");
 
   /* ================= 图层开关 / 倾斜视角 / 状态持久化 ================= */
   const tsel = s => document.querySelector(s);
   const layers = [
-    ["ly-rail", "path.rail, path.railglow, path.railflow"],
+    ["ly-rail", "path.rail, path.railglow, path.railflow, circle.railstop"],
     ["ly-road", "path.road"],
-    ["ly-flight", "path.flight"],
-    ["ly-city", "circle.city"]
+    ["ly-flight", "path.flight, .plane, .flight-chip"],
+    ["ly-city", "g.city"]
   ];
   function applyL() {
     layers.forEach(([id, sel]) => {
@@ -469,14 +584,13 @@ const GEO = window.CHINA_GEO;
     tsvg.selectAll("path.railglow").attr("opacity", null);
     tsvg.selectAll("path.railflow").attr("opacity", null);
   }
-  const hasPt = (pts, c) => pts.some(p => p[0] === c[0] && p[1] === c[1]);
   tsvg.selectAll("path.rail")
     .on("mouseover", (e, d) => focusRails(x => x === d))
     .on("mouseout", clearF);
   d3.select("#map-svg").selectAll("circle.hub")
     .on("mouseover", (e, d) => focusRails(r => hasPt(r.pts, [d.lon, d.lat])))
     .on("mouseout", clearF);
-  tsvg.selectAll("circle.city")
+  tsvg.selectAll("g.city")
     .on("mouseover", (e, d) => focusRails(r => hasPt(r.pts, d.pts[0])))
     .on("mouseout", clearF);
 })();
