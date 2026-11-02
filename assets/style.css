@@ -55,7 +55,8 @@ body {
     linear-gradient(var(--grid) 1px, transparent 1px),
     linear-gradient(90deg, var(--grid) 1px, transparent 1px);
   background-size: 28px 28px;
-  line-height: 1.62;
+  line-height: 1.6;
+  letter-spacing: 0.01em;
   -webkit-font-smoothing: antialiased;
   min-height: 100vh;
 }
@@ -726,3 +727,188 @@ table.admin a.ext { text-decoration: underline; }
   .quiz-body { padding: 24px 26px 28px; }
   .article { padding: 28px 32px; }
 }
+
+/* ============================================================
+ * v4 章节头 / 章—节—条编号 / 表号 / 条例体 / 引文 / 筹备中印章 /
+ * 三翼飞轮（SVG 转子）/ 四类营转换图 / 循环小图 / 页脚 sitemap
+ * 版式纪律：衬线只给章名与表格头；章号大字衬线；正文黑体；数据等宽
+ * ============================================================ */
+
+/* 锚点落点避开吸顶导航 */
+.hero[id], .sec[id], h3.list-title[id], .layer-block[id] { scroll-margin-top: 66px; }
+
+/* ---------- 章节头（Ch.01 式 · 左大号章号 + 章名导读 + 右页内目录） ---------- */
+.chap-head {
+  display: flex; align-items: flex-end; gap: 14px;
+  border-bottom: 2px solid var(--ink);
+  padding-bottom: 10px; margin-bottom: 14px;
+}
+.chap-no {
+  font-family: var(--serif); font-weight: 900; line-height: 1;
+  font-size: clamp(1.7rem, 3.4vw, 2.3rem);
+  color: var(--ink); white-space: nowrap; letter-spacing: 1px;
+}
+.chap-main { flex: 1; min-width: 0; }
+.chap-main h2 {
+  font-family: var(--serif); font-weight: 900;
+  font-size: clamp(1.3rem, 2.6vw, 1.72rem); line-height: 1.3;
+}
+.chap-lead { color: var(--ink-soft); font-size: 0.9rem; margin-top: 4px; max-width: 52em; }
+.chap-toc {
+  flex: none; display: flex; flex-direction: column; gap: 1px;
+  text-align: right; font-size: 0.76rem; max-width: 230px;
+}
+.chap-toc .toc-cap { font-family: var(--mono); font-size: 0.6rem; letter-spacing: 2px; color: var(--ink-faint); margin-bottom: 3px; }
+.chap-toc a { color: var(--ink-soft); white-space: nowrap; padding: 1px 0; border-bottom: 1px dashed transparent; }
+.chap-toc a:hover { color: var(--ink-deep); border-bottom-color: var(--line); }
+@media (max-width: 900px) { .chap-toc { display: none; } }
+
+/* ---------- 节标题：显式「章—节」编号（§4.1），与既有 § 计数器并存 ---------- */
+h3.list-title.xn { counter-increment: none; }
+h3.list-title.xn::before { content: none; }
+h3.list-title .lt-no { font-family: var(--serif); font-weight: 900; font-size: 0.95rem; color: var(--ink); }
+
+/* ---------- 表号（表 4-1 式 · 表格必须有编号） ---------- */
+.tbl-cap { display: flex; align-items: baseline; gap: 8px; font-size: 0.84rem; font-weight: 700; color: var(--ink-deep); margin: 12px 0 5px; }
+.tbl-cap .tno { font-family: var(--mono); font-size: 0.72rem; font-weight: 700; color: var(--ink); border: 1px solid var(--line); border-radius: 3px; padding: 0 6px; background: var(--paper-2); white-space: nowrap; }
+
+/* ---------- 条例体（一条一行 · 编号列出） ---------- */
+ol.rule-list { list-style: none; counter-reset: rl; margin: 4px 0 8px; }
+ol.rule-list li {
+  counter-increment: rl; position: relative;
+  padding: 6px 0 6px 52px; border-bottom: 1px dashed var(--line);
+  font-size: 0.9rem; color: var(--ink-soft);
+}
+ol.rule-list li::before {
+  content: '第 ' counter(rl) ' 条';
+  position: absolute; left: 0; top: 7px;
+  font-family: var(--mono); font-size: 0.7rem; font-weight: 700; color: var(--ink);
+  border-bottom: 2px solid var(--duck); white-space: nowrap;
+}
+ol.rule-list li:last-child { border-bottom: none; }
+ol.rule-list li b { color: var(--ink-deep); }
+
+/* ---------- 引文块（开源态度宣言） ---------- */
+.quote-block {
+  border: 1px solid var(--line); border-left: 4px solid var(--duck-deep);
+  background: var(--paper-2); border-radius: 0 8px 8px 0;
+  padding: 14px 18px 10px; margin: 12px 0;
+}
+.quote-block .qb-text { font-size: 1rem; line-height: 1.85; color: var(--ink-deep); }
+.quote-block .qb-src { font-size: 0.74rem; color: var(--ink-faint); margin-top: 6px; text-align: right; }
+
+/* ---------- 筹备中印章（规划线专用 · 不冒充已开设） ---------- */
+.stamp-prep {
+  display: inline-block; transform: rotate(-5deg);
+  font-family: var(--serif); font-weight: 900; font-size: 0.7rem; letter-spacing: 2px;
+  color: var(--ink-soft); border: 2px solid var(--ink-soft); border-radius: 4px;
+  padding: 1px 8px; background: rgba(36, 70, 107, 0.05); white-space: nowrap; vertical-align: middle;
+}
+
+/* ---------- 三翼飞轮（首页 Ch.01 · 唯一 bold 元素） ---------- */
+.fw-stage { position: relative; max-width: 620px; aspect-ratio: 1 / 1; margin: 10px auto 2px; }
+.fw-rotor { position: absolute; inset: 0; width: 100%; height: 100%; display: block; animation: fw-rot 90s linear infinite; transform-origin: 50% 50%; }
+@keyframes fw-rot { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .fw-rotor { animation: none; } }
+.fw-hub {
+  position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+  width: 31%; aspect-ratio: 1; border-radius: 50%;
+  background: var(--duck); border: 2px solid var(--ink);
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  text-align: center; padding: 10px; z-index: 2;
+}
+.fw-hub b { font-family: var(--serif); font-weight: 900; font-size: clamp(1rem, 2.4vw, 1.25rem); line-height: 1.3; }
+.fw-hub span { font-size: 0.64rem; color: var(--ink-deep); opacity: 0.85; line-height: 1.55; margin-top: 3px; }
+.fw-wing {
+  position: absolute; width: 31%; min-width: 158px; z-index: 2;
+  background: var(--paper-2); border: 1.5px solid var(--ink); border-radius: 8px;
+  padding: 8px 10px; transform: translate(-50%, -50%);
+  box-shadow: 0 0 0 5px var(--paper);   /* 纸色光环：截断环线，保住卡片可读性 */
+}
+.fw-wing .fww-drive { font-family: var(--mono); font-size: 0.62rem; font-weight: 700; color: var(--duck-deep); letter-spacing: 1px; display: block; }
+.fw-wing .fww-name { font-weight: 800; font-size: 0.92rem; display: block; margin: 1px 0 2px; }
+.fw-wing .fww-line { font-size: 0.7rem; color: var(--ink-soft); line-height: 1.5; display: block; }
+.fw-wing.pos-top { left: 50%; top: 15%; }
+.fw-wing.pos-rb { left: 80.3%; top: 67.5%; }
+.fw-wing.pos-lb { left: 19.7%; top: 67.5%; }
+.fw-cap { margin-top: 6px; }
+/* 移动端：飞轮改纵向流程（环隐去，箭头衔接；环上定位偏移全部归零） */
+@media (max-width: 719px) {
+  .fw-stage { aspect-ratio: auto; max-width: none; }
+  .fw-rotor { display: none; }
+  .fw-hub { position: static; transform: none; width: 100%; aspect-ratio: auto; border-radius: 8px; padding: 12px; }
+  .fw-wing, .fw-wing.pos-top, .fw-wing.pos-rb, .fw-wing.pos-lb {
+    position: relative; left: auto; top: auto; transform: none;
+    width: 100%; min-width: 0; margin-top: 30px;
+  }
+  .fw-wing::before {
+    content: '↓'; position: absolute; left: 50%; top: -26px; transform: translateX(-50%);
+    font-size: 0.9rem; color: var(--ink-faint);
+  }
+}
+
+/* ---------- 数据飞轮闭环小图（首页 Ch.02 与 #/open 措辞一致） ---------- */
+.loop-ring {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 6px;
+  border: 1px dashed var(--line); border-radius: 8px;
+  background: rgba(255, 201, 60, 0.08); padding: 10px 12px; margin: 10px 0;
+}
+.loop-ring .lr-tag {
+  font-family: var(--mono); font-size: 0.64rem; font-weight: 700; letter-spacing: 2px;
+  color: var(--paper-2); background: var(--ink); border-radius: 3px; padding: 2px 8px; margin-right: 4px;
+}
+.loop-ring .lr-back { color: var(--duck-deep); font-weight: 700; white-space: nowrap; }
+
+/* ---------- 四类营 ③⇄④ 转换图（桌面横排 · 移动纵排） ---------- */
+.transfer-diagram { display: flex; align-items: stretch; gap: 10px; margin: 12px 0; }
+.td-box { flex: 1; border: 1.5px solid var(--ink); border-radius: 8px; background: var(--paper-2); padding: 10px 12px; min-width: 0; }
+.td-box .td-no { font-family: var(--mono); font-size: 0.64rem; font-weight: 700; color: var(--duck-deep); letter-spacing: 2px; }
+.td-box b { display: block; font-size: 0.95rem; margin: 2px 0; }
+.td-box p { font-size: 0.76rem; color: var(--ink-soft); margin: 0; }
+.td-mid { flex: 0 0 190px; display: flex; flex-direction: column; justify-content: center; gap: 6px; }
+.td-arrow {
+  font-size: 0.74rem; color: var(--ink-soft); line-height: 1.5;
+  border: 1px dashed var(--line); border-radius: 4px;
+  padding: 5px 8px; background: rgba(255, 201, 60, 0.10);
+}
+.td-arrow b { color: var(--ink-deep); }
+.td-arrow .dg { display: inline-block; font-weight: 900; color: var(--ink); margin-right: 4px; }
+@media (max-width: 719px) {
+  .transfer-diagram { flex-direction: column; }
+  .td-mid { flex: none; width: 100%; }
+  .td-arrow .dg { transform: rotate(90deg); }
+}
+
+/* ---------- 层块（合作渠道三层详述） ---------- */
+.layer-block { border: 1px solid var(--line); border-left: 3px solid var(--duck-deep); border-radius: 0 8px 8px 0; background: var(--paper-2); padding: 12px 14px; margin: 10px 0; }
+.layer-block .lb-head { font-weight: 800; font-size: 0.95rem; margin-bottom: 4px; }
+.layer-block .lb-head .lb-tag { font-family: var(--mono); font-size: 0.64rem; font-weight: 700; color: var(--ink); border: 1px solid var(--line); border-radius: 3px; padding: 0 6px; margin-right: 8px; white-space: nowrap; }
+.layer-block p { font-size: 0.88rem; color: var(--ink-soft); margin: 0; }
+.layer-block .lb-entry { margin-top: 6px; font-size: 0.78rem; }
+.layer-block .lb-entry a { color: var(--ink); text-decoration: underline; text-underline-offset: 3px; }
+
+/* ---------- 章尾「详见 →」 ---------- */
+.chap-more { margin-top: 10px; font-size: 0.88rem; text-align: right; color: var(--ink-faint); }
+.chap-more a { font-weight: 700; color: var(--ink); border-bottom: 1.5px solid var(--duck-deep); overflow-wrap: anywhere; }
+.chap-more a:hover { background: rgba(255, 201, 60, 0.35); }
+
+/* ---------- 页脚全站结构 sitemap ---------- */
+.f-sitemap {
+  display: grid; grid-template-columns: 1fr; gap: 12px;
+  text-align: left; max-width: 1180px; margin: 14px auto 4px; padding: 0 20px;
+}
+@media (min-width: 760px) { .f-sitemap { grid-template-columns: 1.15fr 1fr 1fr; gap: 18px; } }
+.f-sitemap .sm-group { border: 1px solid var(--line); border-radius: 8px; background: var(--paper-2); padding: 10px 12px; }
+.f-sitemap h4 { font-family: var(--serif); font-weight: 900; font-size: 0.85rem; border-bottom: 1px solid var(--line); padding-bottom: 4px; margin-bottom: 5px; }
+.f-sitemap ul { list-style: none; }
+.f-sitemap li { font-size: 0.82rem; line-height: 1.9; color: var(--ink-soft); }
+.f-sitemap li a { color: var(--ink-soft); }
+.f-sitemap li a:hover { color: var(--ink-deep); }
+.f-sitemap .sm-no { font-family: var(--mono); font-size: 0.68rem; font-weight: 700; color: var(--duck-deep); margin-right: 6px; }
+.f-sitemap .sm-sub { color: var(--ink-faint); font-size: 0.7rem; margin-left: 6px; }
+
+/* ---------- v4 字体层级纪律：衬线只给章名与表格头，其余标题回归黑体 ---------- */
+h3.list-title, .card h3, .post-title, .article-title, .act-title,
+.mani-card h3, .tri-table td h3, .track-card .tk-slogan, .gloss-table .g-term { font-family: var(--sans); }
+h3.list-title { font-weight: 800; }
+.sec-no { font-family: var(--mono); font-weight: 700; letter-spacing: 1px; }

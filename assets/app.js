@@ -1,7 +1,8 @@
-/* MicroDuck 造物世界 · 前端应用 v3（hash 路由 SPA）
- * 路由：#/ 首页（隐藏 #app-view 显示静态内容）、#/test 段位测试（33 题分支问卷 v1.1.0）、
- *       #/growth 成长体系、#/map 作战图谱、#/camp 三轨营+报名、#/open 开源内核、
- *       #/activities 活动、#/library 内容库、#/library/:id 文章详情、#/pledge 十方共赢、#/admin 管理指南。
+/* MicroDuck 造物世界 · 前端应用 v4（hash 路由 SPA · 章节头版式）
+ * 路由：#/ 首页（五章一页式商业结构总纲，静态内容）、#/test 段位测试（33 题分支问卷 v1.1.0）、
+ *       #/growth 成长体系、#/map 作战图谱、#/camp 教育与营地（Ch.04–05 深读 + 报名）、#/open 开源内核（Ch.02 深读）、
+ *       #/activities 活动、#/library 内容库、#/library/:id 文章详情、#/vision 合作与共赢（Ch.03 深读，含锚点 #/vision/:id）、
+ *       #/pledge 已并入 #/vision（路由别名保留）、#/admin 管理指南。
  * 数据全部经 window.Api（assets/api.js）；题库 window.QUIZ（assets/quiz-data.js）；
  * FW_CONFIG.SUPABASE 的 url/anonKey 任一为空 = 演示模式。
  * 内容源：MATERIALS-BRIEF.md（数字逐字）；问卷源：microduck-survey/docs/问卷全文-v1.1.0.docx。
@@ -135,11 +136,14 @@
     return h + '</select>';
   }
 
-  function pageHead(kicker, title, desc) {
-    return '<div class="page-head">' +
-      '<div class="kicker">' + kicker + '</div>' +
-      '<h2>' + title + '</h2>' +
-      (desc ? '<p class="desc">' + desc + '</p>' : '') +
+  /* v4 章节头：左大号编号（Ch./P. 衬线）+ 章名 + 导读 + 右侧页内锚点目录（桌面） */
+  function pageHead(no, title, desc, toc) {
+    return '<div class="chap-head">' +
+      '<div class="chap-no" aria-hidden="true">' + esc(no) + '</div>' +
+      '<div class="chap-main"><h2>' + title + '</h2>' +
+      (desc ? '<p class="chap-lead">' + desc + '</p>' : '') +
+      '</div>' +
+      (toc ? '<nav class="chap-toc" aria-label="页内目录">' + toc + '</nav>' : '') +
       '</div>';
   }
 
@@ -156,8 +160,14 @@
     if (head === 'map') return { view: 'map' };
     if (head === 'camp') return { view: 'camp' };
     if (head === 'open') return { view: 'open' };
-    if (head === 'pledge') return { view: 'pledge' };
-    if (head === 'vision') return { view: 'vision' };
+    if (head === 'pledge') return { view: 'vision' };   /* v4：十方共赢并入合作与共赢，旧链接别名 */
+    if (head === 'vision') {
+      var anchor = parts[1] || '';
+      if (anchor) {
+        try { anchor = decodeURIComponent(anchor); } catch (e) { /* 原样使用 */ }
+      }
+      return { view: 'vision', anchor: anchor };
+    }
     if (head === 'activities') return { view: 'activities' };
     if (head === 'library') {
       if (parts[1]) {
@@ -177,7 +187,7 @@
   function setNavActive(view) {
     var map = {
       home: '#/', test: '#/test', growth: '#/growth', map: '#/map',
-      camp: '#/camp', library: '#/library', post: '#/library'
+      camp: '#/camp', library: '#/library', post: '#/library', vision: '#/vision'
     };
     var target = map[view] || '';
     var links = document.querySelectorAll('.nav-links a');
@@ -205,8 +215,7 @@
     else if (r.view === 'map') { setNavActive('map'); viewMap(); }
     else if (r.view === 'camp') { setNavActive('camp'); viewCamp(); }
     else if (r.view === 'open') { setNavActive(''); viewOpen(); }
-    else if (r.view === 'pledge') { setNavActive(''); viewPledge(); }
-    else if (r.view === 'vision') { setNavActive(''); viewVision(); }
+    else if (r.view === 'vision') { setNavActive('vision'); viewVision(r.anchor); }
     else if (r.view === 'activities') { setNavActive(''); viewActivities(); }
     else if (r.view === 'library') { setNavActive('library'); viewLibrary(); }
     else if (r.view === 'post') { setNavActive('post'); viewPost(r.id); }
@@ -805,7 +814,7 @@
 
     appView.innerHTML =
       '<section class="page"><div class="wrap">' +
-        pageHead('GROWTH SYSTEM', '成长体系',
+        pageHead('P.05', '成长体系',
           '七级段位，每级一段能讲出来的故事。段位永久有效；赛季排行榜每半年重置；个人和组织共用一条经验槽——帮别人升级就是给自己升级。') +
         '<div class="tune-note">EXP 数值待实测调参（方案注明，以书稿版为基准）</div>' +
         '<h3 class="list-title">七级段位</h3>' +
@@ -920,7 +929,7 @@
 
     appView.innerHTML =
       '<section class="page"><div class="wrap">' +
-        pageHead('BATTLE MAP', '作战图谱',
+        pageHead('P.06', '作战图谱',
           '扩张不是勇气问题，是数据批准问题。先看台账，再看地图——光是数据点亮的，铺之前，先验电压。') +
         '<h3 class="list-title">运动路线图</h3>' +
         '<div class="timeline"><div class="card table-card"><div class="table-wrap"><table class="data-table road-table">' +
@@ -949,7 +958,7 @@
         '<div class="rank-strip wing-gates">' +
           '<span class="rank-chip"><b>闸1</b>满班率</span><span class="rank-arrow">·</span>' +
           '<span class="rank-chip"><b>闸2</b>NPS</span><span class="rank-arrow">·</span>' +
-          '<span class="rank-chip"><b>闸3</b>CAC 占比</span><span class="rank-arrow">·</span>' +
+          '<span class="rank-chip"><b>闸3</b>获客成本</span><span class="rank-arrow">·</span>' +
           '<span class="rank-chip"><b>闸4</b>转介绍</span>' +
         '</div>' +
         '<p class="dim-label">四道闸口 · 过闸才准扩城，一道不过全军待命</p>' +
@@ -1013,6 +1022,39 @@
     ['每天 21:00', '晚报', '在宿登记确认 + 明日预告']
   ];
 
+  /* v4 四条产品线（Ch.04 · 第 ④ 条为规划线，须明确标注筹备中，不冒充已开设） */
+  var PRODUCT_LINES = [
+    ['① 通识兴趣培养', 'A 轨 · 初三–高一', '亲手造出你的第一只 AI 机器人——5 天日营，从零件盒到会走的鸭子。', ''],
+    ['② 微专业开设培养', 'B 轨 · 高校共建 · 高二–大一', '从复刻到创造，只差一个寒假；学分课程共建，Demo Day 当场路演。', ''],
+    ['③ 开源社区联合培养', 'C 轨 · 社区贡献通道 · 大二 / 研究生 / 职场', '把一只鸭子做成一门生意——营后 4 周陪跑，贡献进社区履历。', ''],
+    ['④ 规划中', '—', 'AI agent 开发设计课程 · 高中数物化教育课程（尚未开设，2027 后排期）。', 'prep']
+  ];
+
+  /* v4 四类营地（Ch.05 · ③与④在条件合适时可相互转换） */
+  var CAMP_TYPES = [
+    ['① 通识兴趣营', '初三 – 高一', '兴趣点火 · 5 天日营', '→ 助教池（每期约 20%）'],
+    ['② 微专业工程营', '高二 – 大一', '工程成型 · 6 天', '→ 助教池（每期约 20%）'],
+    ['③ 落地联培营', '大二 · 研究生 · 职场', '落地上路 · 6 天 + 4 周陪跑', '→ 主讲（双城认证）→ 城市合伙人'],
+    ['④ 讲师合伙人营', '助教 · 讲师 · 城市合伙人', '认证开点 · 持牌经营', '→ 城市节点 / 分部共建']
+  ];
+
+  /* v4 身份与关系设计（Ch.05 着重点 · 与首页 Ch.05 措辞一致） */
+  var IDENTITY_ROWS = [
+    'Duck # 编号终身制——报名即发实体徽章，编号永久保留。',
+    '七级段位资产——青铜到传奇，段位终身有效；排名会刷新，足迹不会。',
+    '首只鸭点亮仪式——开营夜全场熄灯，每人点亮自己的鸭。',
+    '成长档案——三报节律 + 结营成长册，翻群即翻档案。',
+    '造物者节——每年 1 月首战开幕日：年度大促 + 限定款 + 限定徽章。'
+  ];
+
+  var RELATION_ROWS = [
+    '社团——校园翼 20 校社团分部，一校一据点。',
+    '战队——区域赛与校际对抗的竞赛战队。',
+    '城市节点——Chapter Kit 开办章节，城市分部自治。',
+    'alumni 网络——老学员网络，接转介绍与招聘。',
+    '师徒链——学员 → 助教 → 主讲 → 合伙人，帮别人升级就是给自己升级。'
+  ];
+
   function viewCamp() {
     var trackCards = '';
     for (var t = 0; t < CAMP_TRACKS.length; t++) {
@@ -1048,46 +1090,77 @@
       var rr = REPORT_ROWS[rp];
       reportRows += '<tr><td class="p-price">' + esc(rr[0]) + '</td><td><b>' + esc(rr[1]) + '</b></td><td>' + esc(rr[2]) + '</td></tr>';
     }
+    var lineRows = '';
+    for (var pl = 0; pl < PRODUCT_LINES.length; pl++) {
+      var plr = PRODUCT_LINES[pl];
+      lineRows += '<tr><td><b>' + esc(plr[0]) + '</b>' + (plr[3] ? ' <span class="stamp-prep">筹备中 · 2027 后排期</span>' : '') + '</td>' +
+        '<td>' + esc(plr[1]) + '</td><td>' + esc(plr[2]) + '</td></tr>';
+    }
+    var typeRows = '';
+    for (var ct = 0; ct < CAMP_TYPES.length; ct++) {
+      var ctp = CAMP_TYPES[ct];
+      typeRows += '<tr><td><b>' + esc(ctp[0]) + '</b></td><td>' + esc(ctp[1]) + '</td><td>' + esc(ctp[2]) + '</td><td>' + esc(ctp[3]) + '</td></tr>';
+    }
+    var identityHtml = '';
+    for (var ir = 0; ir < IDENTITY_ROWS.length; ir++) identityHtml += '<li>' + esc(IDENTITY_ROWS[ir]) + '</li>';
+    var relationHtml = '';
+    for (var rx = 0; rx < RELATION_ROWS.length; rx++) relationHtml += '<li>' + esc(RELATION_ROWS[rx]) + '</li>';
+
+    var tocCamp =
+      '<span class="toc-cap">本页目录</span>' +
+      '<a href="#camp-41">§4.1 四条产品线</a>' +
+      '<a href="#camp-42">§4.2 五站证据链</a>' +
+      '<a href="#camp-43">§4.3 三轨详卡</a>' +
+      '<a href="#camp-44">§4.4 产品全景</a>' +
+      '<a href="#camp-45">§4.5 亲带一年</a>' +
+      '<a href="#camp-46">§4.6 社团 8 周课表</a>' +
+      '<a href="#camp-51">§5.1 四类营地</a>' +
+      '<a href="#camp-52">§5.2 身份与关系</a>' +
+      '<a href="#camp-53">§5.3 成长档案</a>' +
+      '<a href="#camp-54">§5.4 助教通道</a>' +
+      '<a href="#camp-form-head">报名</a>';
 
     appView.innerHTML =
       '<section class="page"><div class="wrap">' +
-        pageHead('THREE TRACKS', '三轨营',
-          '兴趣点火、工程成型、落地上路。任务阶梯 L0–L3 全线贯通：跑通 → 自训 → 自定义 → 真机可选。') +
+        pageHead('P.02', '教育与营地',
+          '教育设计与营地结构的深读页：四条产品线、五站证据链、三轨详卡、四类营地与身份关系设计，页尾报名。', tocCamp) +
+
+        '<h3 class="list-title xn" id="camp-41"><span class="lt-no">§4.1</span>四条产品线</h3>' +
+        '<div class="tbl-cap"><span class="tno">表 4-1</span>四条产品线总表（第 ④ 条为规划线 · 筹备中）</div>' +
+        '<div class="card table-card"><div class="table-wrap"><table class="data-table">' +
+          '<thead><tr><th>产品线</th><th>对应轨 · 人群</th><th>一句话</th></tr></thead>' +
+          '<tbody>' + lineRows + '</tbody></table></div></div>' +
+        '<p class="table-foot">第 ④ 条为规划线，未排入首战——宁可慢，不可烂。</p>' +
+        '<div class="dim-line"></div>' +
+
+        '<h3 class="list-title xn" id="camp-42"><span class="lt-no">§4.2</span>产品主线 · 五站证据链</h3>' +
+        '<p class="sec-desc" style="margin-bottom:8px">每条产品线都以同一条证据链为交付底座——深浅不同，证据同构：每一站都留下可验收的实物。</p>' +
+        '<div class="chain-bar">' +
+          '<div class="chain-cell" title="BOM 清单与到货验收单：15 颗舵机逐个空转测试"><span class="cc-no">01</span><b>采购</b></div>' +
+          '<div class="chain-cell" title="装配标定记录 + 首只鸭点亮仪式（装鸭 +100 EXP）"><span class="cc-no">02</span><b>3D 打印装配</b></div>' +
+          '<div class="chain-cell" title="你自己的训练曲线：从 −0.20 乱蹬到 +13.74 会走"><span class="cc-no">03</span><b>仿真 RL</b></div>' +
+          '<div class="chain-cell" title="部署契约校验：obs[1,61] → act[1,14] 通过"><span class="cc-no">04</span><b>ONNX 部署</b></div>' +
+          '<div class="chain-cell" title="15 秒鸭子走路视频：作业即广告，产物即传播物"><span class="cc-no">05</span><b>真机行走</b></div>' +
+        '</div>' +
+        '<div class="chain-evi">BOM 清单与到货验收单 · 装配标定记录 + 首只鸭点亮仪式 · 你自己的训练曲线 −0.20 → +13.74 · 部署契约校验 obs[1,61] → act[1,14] 通过 · 15 秒鸭子走路视频：作业即广告，产物即传播物</div>' +
+        '<div class="chain-cap">FIVE-STATION EVIDENCE CHAIN · H 250 MM · ZERO TO ONE · 造物世界</div>' +
+        '<div class="dim-line"></div>' +
+
+        '<h3 class="list-title xn" id="camp-43"><span class="lt-no">§4.3</span>三轨详卡</h3>' +
+        '<p class="sec-desc" style="margin-bottom:10px">兴趣点火、工程成型、落地上路——三条轨道，同一个终点：亲手做成一件难事。任务阶梯 L0–L3 全线贯通：跑通 → 自训 → 自定义 → 真机可选。</p>' +
         '<div class="grid grid-3">' + trackCards + '</div>' +
         '<div class="dim-line"></div>' +
-        '<h3 class="list-title">产品全景表</h3>' +
+
+        '<h3 class="list-title xn" id="camp-44"><span class="lt-no">§4.4</span>产品全景与价格</h3>' +
+        '<div class="tbl-cap"><span class="tno">表 4-2</span>产品全景表</div>' +
         '<div class="card table-card"><div class="table-wrap"><table class="price-table data-table">' +
           '<thead><tr><th>产品</th><th>人群</th><th>价格</th><th>交付</th></tr></thead>' +
           '<tbody>' + priceRows + '</tbody></table></div></div>' +
         '<div class="dim-line"></div>' +
-        '<h3 class="list-title">社团 8 周课表</h3>' +
-        '<p class="desc" style="margin-bottom:10px">每周 90 分钟，一学期把一只鸭从零件盒走到 Demo Day。每节课固定留下 1 条当堂产物——产物即档案。</p>' +
-        '<div class="card table-card"><div class="table-wrap"><table class="price-table data-table" id="camp-week-table">' +
-          '<thead><tr><th>周</th><th>课</th><th>内容</th><th>当堂产物</th></tr></thead>' +
-          '<tbody>' + weekRows + '</tbody></table></div></div>' +
-        '<div class="dim-line"></div>' +
-        '<h3 class="list-title">家长看到的成长档案</h3>' +
-        '<p class="desc" style="margin-bottom:10px">三报节律 + 周五直播 + 结营成长册，全程微信群直达、零新软件——翻群即翻档案。</p>' +
-        '<div class="card table-card"><div class="table-wrap"><table class="price-table data-table" id="report-table">' +
-          '<thead><tr><th>时点</th><th>报</th><th>内容（实物）</th></tr></thead>' +
-          '<tbody>' + reportRows + '</tbody></table></div></div>' +
-        '<div class="report-extra">' +
-          '<div class="rx-item"><b>每周五 19:00 · 鸭子时刻</b>15 分钟学员群直播：本周最佳鸭子巡游 + 下周预告。</div>' +
-          '<div class="rx-item"><b>结营 48h · 成长册</b>网页链接直达：时间线 + 全部视频 + 段位事件 + 讲师总评，可转发。</div>' +
-        '</div>' +
-        '<p class="city-note">家长视角只有一件事：孩子的变化看得见。晨报 / 日报 / 晚报 + 可转发的成长册，就是「信任」两个字的实物形态。</p>' +
-        '<div class="dim-line"></div>' +
-        '<h3 class="list-title">结营后的助教通道</h3>' +
-        '<div class="card ta-card">' +
-          '<span class="tk-tag">TA CHANNEL</span>' +
-          '<p class="post-sum" style="margin-top:8px">结营当天宣布助教标准：<b>出勤 100% + 作品达标 + 15 分钟面试</b>——命中即入助教池，每期约 20%。下一座新城开营时，助教就从这里出。</p>' +
-          '<p class="ta-quote">「今天社团里的大二学生，四年后就是新课市的助教与主讲。」</p>' +
-        '</div>' +
-        '<div class="dim-line"></div>' +
-        '<h3 class="list-title">亲带一年 · 三段</h3>' +
+
+        '<h3 class="list-title xn" id="camp-45"><span class="lt-no">§4.5</span>亲带一年 · 三段</h3>' +
         '<div class="m123">' + m123 + '</div>' +
-        '<div class="dim-line"></div>' +
-        '<div class="seal-block">' +
+        '<div class="seal-block" style="margin-top:14px">' +
           '<span class="seal-stamp">红线</span>' +
           '<h3>五不四真 · 学术红线</h3>' +
           '<ul>' +
@@ -1097,8 +1170,70 @@
           '<p class="post-sum" style="margin-top:10px">招生官严查付费推荐信——真实亲带既是合规底线，也是最强卖点。</p>' +
         '</div>' +
         '<div class="dim-line"></div>' +
-        '<h3 class="list-title" id="camp-form-head">报名三轨营</h3>' +
-        '<p class="desc" style="margin-bottom:14px">提交后由首战城团队 48 小时内联系；也可先做<a href="#/test">段位测试</a>再决定轨道。</p>' +
+
+        '<h3 class="list-title xn" id="camp-46"><span class="lt-no">§4.6</span>社团 8 周课表</h3>' +
+        '<p class="sec-desc" style="margin-bottom:4px">每周 90 分钟，一学期把一只鸭从零件盒走到 Demo Day。每节课固定留下 1 条当堂产物——产物即档案。</p>' +
+        '<div class="tbl-cap"><span class="tno">表 4-3</span>社团 8 周课表（每周 90 分钟 · 每节课 1 条当堂产物）</div>' +
+        '<div class="card table-card"><div class="table-wrap"><table class="price-table data-table" id="camp-week-table">' +
+          '<thead><tr><th>周</th><th>课</th><th>内容</th><th>当堂产物</th></tr></thead>' +
+          '<tbody>' + weekRows + '</tbody></table></div></div>' +
+        '<div class="dim-line"></div>' +
+
+        '<h3 class="list-title xn" id="camp-51"><span class="lt-no">§5.1</span>四类营地与转换</h3>' +
+        '<div class="tbl-cap"><span class="tno">表 5-1</span>四类营地（按人群分层）</div>' +
+        '<div class="card table-card"><div class="table-wrap"><table class="data-table">' +
+          '<thead><tr><th>营</th><th>人群</th><th>定位</th><th>出口</th></tr></thead>' +
+          '<tbody>' + typeRows + '</tbody></table></div></div>' +
+        '<div class="transfer-diagram">' +
+          '<div class="td-box"><div class="td-no">CAMP ③</div><b>落地联培营</b><p>大二 · 研究生 · 职场。6 天 + 4 周陪跑：从产品到开城，营后上路。</p></div>' +
+          '<div class="td-mid">' +
+            '<div class="td-arrow"><span class="dg">→</span><b>晋升：</b>学员达标，转入助教 / 讲师</div>' +
+            '<div class="td-arrow"><span class="dg">←</span><b>回炉：</b>讲师可回炉落地营深造</div>' +
+          '</div>' +
+          '<div class="td-box"><div class="td-no">CAMP ④</div><b>讲师合伙人营</b><p>助教 · 讲师 · 城市合伙人。认证、开点、持牌——把闸口交到你手里。</p></div>' +
+        '</div>' +
+        '<ol class="rule-list">' +
+          '<li><b>③ 与 ④ 在条件合适时可相互转换</b>，通道常开，不设一次性门槛。</li>' +
+          '<li><b>转换双向：</b>学员达标 → 助教 / 讲师；讲师可回炉落地营深造。</li>' +
+        '</ol>' +
+        '<div class="dim-line"></div>' +
+
+        '<h3 class="list-title xn" id="camp-52"><span class="lt-no">§5.2</span>身份与关系设计</h3>' +
+        '<div class="brief-grid">' +
+          '<div>' +
+            '<div class="tbl-cap"><span class="tno">身份</span>归属设计 · 让「造物者」看得见摸得着</div>' +
+            '<ol class="rule-list">' + identityHtml + '</ol>' +
+          '</div>' +
+          '<div>' +
+            '<div class="tbl-cap"><span class="tno">关系</span>网络设计 · 让每个人挂在一张网上</div>' +
+            '<ol class="rule-list">' + relationHtml + '</ol>' +
+          '</div>' +
+        '</div>' +
+        '<div class="dim-line"></div>' +
+
+        '<h3 class="list-title xn" id="camp-53"><span class="lt-no">§5.3</span>家长看到的成长档案</h3>' +
+        '<p class="sec-desc" style="margin-bottom:4px">三报节律 + 周五直播 + 结营成长册，全程微信群直达、零新软件——翻群即翻档案。</p>' +
+        '<div class="tbl-cap"><span class="tno">表 5-2</span>三报节律（全程微信群直达）</div>' +
+        '<div class="card table-card"><div class="table-wrap"><table class="price-table data-table" id="report-table">' +
+          '<thead><tr><th>时点</th><th>报</th><th>内容（实物）</th></tr></thead>' +
+          '<tbody>' + reportRows + '</tbody></table></div></div>' +
+        '<div class="report-extra">' +
+          '<div class="rx-item"><b>每周五 19:00 · 鸭子时刻</b>15 分钟学员群直播：本周最佳鸭子巡游 + 下周预告。</div>' +
+          '<div class="rx-item"><b>结营 48h · 成长册</b>网页链接直达：时间线 + 全部视频 + 段位事件 + 讲师总评，可转发。</div>' +
+        '</div>' +
+        '<p class="city-note">家长视角只有一件事：孩子的变化看得见。晨报 / 日报 / 晚报 + 可转发的成长册，就是「信任」两个字的实物形态。</p>' +
+        '<div class="dim-line"></div>' +
+
+        '<h3 class="list-title xn" id="camp-54"><span class="lt-no">§5.4</span>结营后的助教通道</h3>' +
+        '<div class="card ta-card">' +
+          '<span class="tk-tag">TA CHANNEL</span>' +
+          '<p class="post-sum" style="margin-top:8px">结营当天宣布助教标准：<b>出勤 100% + 作品达标 + 15 分钟面试</b>——命中即入助教池，每期约 20%。下一座新城开营时，助教就从这里出。</p>' +
+          '<p class="ta-quote">「今天社团里的大二学生，四年后就是新课市的助教与主讲。」</p>' +
+        '</div>' +
+        '<div class="dim-line"></div>' +
+
+        '<h3 class="list-title xn" id="camp-form-head"><span class="lt-no">报名</span>第 001 只鸭，等你点亮。</h3>' +
+        '<p class="sec-desc" style="margin-bottom:14px">提交后由首战城团队 48 小时内联系；也可先做<a href="#/test">段位测试</a>再决定轨道。</p>' +
         '<form id="camp-form" class="card form-card" novalidate>' +
           '<div class="frow">' +
             fld('昵称', inText('cf-nickname', 'nickname', '怎么称呼你', ' maxlength="24"'), { id: 'cf-nickname', required: true }) +
@@ -1165,10 +1300,19 @@
    * ============================================================ */
 
   function viewOpen() {
+    var tocOpen =
+      '<span class="toc-cap">本页目录</span>' +
+      '<a href="#open-21">§2.1 双仓与月度发版</a>' +
+      '<a href="#open-22">§2.2 贡献四步闭环</a>' +
+      '<a href="#open-23">§2.3 声望闭环</a>' +
+      '<a href="#open-24">§2.4 三级徽章</a>' +
+      '<a href="#open-25">§2.5 数据飞轮闭环</a>' +
+      '<a href="#open-26">§2.6 开源态度宣言</a>';
     appView.innerHTML =
       '<section class="page"><div class="wrap">' +
-        pageHead('OPEN CORE', '开源内核',
-          '社区即课程、贡献即成长。图纸 / 代码 / 课程 / 账本全开源，clone 即拿走整套造物能力——fork 不是拥有，clone 下来改完第一行，才算开始。') +
+        pageHead('P.07', '开源内核',
+          '社区即课程、贡献即成长。图纸 / 代码 / 课程 / 账本全开源，clone 即拿走整套造物能力——fork 不是拥有，clone 下来改完第一行，才算开始。', tocOpen) +
+        '<h3 class="list-title xn" id="open-21"><span class="lt-no">§2.1</span>双仓与月度发版</h3>' +
         '<div class="grid grid-2">' +
           '<div class="card repo-card">' +
             '<div class="rc-name">GitHub · 全球主仓</div>' +
@@ -1180,7 +1324,7 @@
           '</div>' +
         '</div>' +
         '<div class="dim-line"></div>' +
-        '<h3 class="list-title">贡献四步闭环</h3>' +
+        '<h3 class="list-title xn" id="open-22"><span class="lt-no">§2.2</span>贡献四步闭环</h3>' +
         '<div class="loop-steps">' +
           '<div class="loop-step"><div class="loop-no">1</div><div><h3>认领 good-first-issue</h3><p>从文档翻译、测试补全到任务魔改，总有一张牌桌缺人。</p></div></div>' +
           '<div class="loop-step"><div class="loop-no">2</div><div><h3>提交 PR（代码 / 文档 / 翻译）</h3><p>「你不留痕迹，只可能因为你什么都没提交。」</p></div></div>' +
@@ -1188,7 +1332,7 @@
           '<div class="loop-step"><div class="loop-no">4</div><div><h3>月度发版 · changelog 署名</h3><p>你的 GitHub ID 进入发版记录——简历可以修饰，提交历史不会。</p></div></div>' +
         '</div>' +
         '<div class="dim-line"></div>' +
-        '<h3 class="list-title">声望闭环</h3>' +
+        '<h3 class="list-title xn" id="open-23"><span class="lt-no">§2.3</span>声望闭环</h3>' +
         '<div class="slot-flow">' +
           '<div class="slot-node"><h3>公开记录</h3><p>个人主页公开记录每一次贡献</p></div>' +
           '<div class="slot-node"><h3>Committer</h3><p>3 次优质合入晋升 Committer</p></div>' +
@@ -1196,11 +1340,23 @@
           '<div class="slot-node"><h3>反哺新人</h3><p>评审与带教，社区自生长</p></div>' +
         '</div>' +
         '<div class="dim-line"></div>' +
-        '<h3 class="list-title">三级徽章</h3>' +
+        '<h3 class="list-title xn" id="open-24"><span class="lt-no">§2.4</span>三级徽章</h3>' +
         '<div class="rank-strip">' +
           '<span class="rank-chip"><b>I</b>复刻者 · 参与</span><span class="rank-arrow">→</span>' +
           '<span class="rank-chip"><b>II</b>魔改师 · 魔改创意</span><span class="rank-arrow">→</span>' +
           '<span class="rank-chip"><b>III</b>原创者 · 孵化作品</span>' +
+        '</div>' +
+        '<div class="dim-line"></div>' +
+        '<h3 class="list-title xn" id="open-25"><span class="lt-no">§2.5</span>数据飞轮闭环</h3>' +
+        '<p class="sec-desc" style="margin-bottom:2px">贡献 → 作品 → 数据 → 课程迭代 → 新贡献者——闭环之外还有持续性构建：课程包公开版本号迭代，贡献者进 changelog，数据反哺课程，课程反哺社区。</p>' +
+        '<div class="loop-ring">' +
+          '<span class="lr-tag">闭环</span><span class="wc-chip">贡献</span><span class="wc-arrow">→</span><span class="wc-chip">作品</span><span class="wc-arrow">→</span><span class="wc-chip">数据</span><span class="wc-arrow">→</span><span class="wc-chip">课程迭代</span><span class="wc-arrow">→</span><span class="wc-chip">新贡献者</span><span class="wc-arrow lr-back">↺ 回到贡献</span>' +
+        '</div>' +
+        '<div class="dim-line"></div>' +
+        '<h3 class="list-title xn" id="open-26"><span class="lt-no">§2.6</span>开源态度宣言</h3>' +
+        '<div class="quote-block">' +
+          '<p class="qb-text">「不惧被模仿。模仿成功了，是替我们做宣传；模仿受挫了，说明存在能力缺口——欢迎来我们这里补齐。」</p>' +
+          '<div class="qb-src">—— MicroDuck 开源态度宣言</div>' +
         '</div>' +
         '<div class="dim-line"></div>' +
         '<div class="lic-note"><b>Apache-2.0</b>（软件 / 训练配方）：可商用，教学安全。<br><b>CC BY-SA-NC</b>（结构 STL / MJCF 网格）：署名-相同方式共享-非商业，硬件商业化需另行授权；PCB 原理图与 BOM 不公开。</div>' +
@@ -1230,7 +1386,7 @@
     '永不取消公益名额 —— 每期收益的固定比例进乡村专场'
   ];
 
-  function viewVision() {
+  function viewVision(anchor) {
     var tri = [
       ['时代的问题', '就业难 × AI 冲击', '市场就业困难，AI 正在冲击就业——这是社会化问题，不是某一代人的问题。'],
       ['我们的愿景', '世界一流产研中心', '把专业知识与产业结合起来，形成一个产学研真正结合的中心。'],
@@ -1242,9 +1398,27 @@
       ['学校', '联培 · 微专业', '以联培模式与高校共建，开设微专业，把专业知识与产业结合起来，合力解决当下时代面临的社会问题。', '高校 · 职业院校'],
       ['个人', '共同分红', '有潜力有兴趣的同学、有能力承担讲师业务的专业人员——我们愿意与您共同分红，享受发展的红利。', '同学 · 专业人员']
     ];
+    var layers = [
+      ['v-org', '机构层', '联培 · 分红 · 协议约束',
+        '与培训机构、企业以联培、分红、协议约束达成一致合作；后期我们掌握资格证书考核权，向有资质的机构与企业授权课程包，配名牌讲师合作共赢。高校与职业院校走联培共建开设微专业，把专业知识与产业结合起来。对方的账：具身智能新品类、高客单产品线、办学与就业 KPI；我方的账：品牌信用、生源与全国网点——对方先赢，我们才进场。'],
+      ['v-parent', '家长层', '传播的一环',
+        '大学毕业工作不好找，家长恰恰能给孩子提供相关的资源信息——家长不是流量，是孩子身边最可信的传播节点。转化不靠销售话术，靠孩子身上看得见的变化：晨报、日报、晚报与可转发的成长册，就是「信任」两个字的实物形态。'],
+      ['v-person', '个人层', '共同分红 · 讲师与合伙人通道',
+        '有潜力有兴趣的同学、有能力承担讲师业务的专业人员——我们愿意与您共同分红，享受发展的红利。一条经验槽贯通始终：学员 → 助教 → 主讲 → 城市合伙人，帮别人升级就是给自己升级。']
+    ];
+    var tocVision =
+      '<span class="toc-cap">本页目录</span>' +
+      '<a href="#vision-31">§3.1 切入点</a>' +
+      '<a href="#vision-32">§3.2 三层合作渠道</a>' +
+      '<a href="#vision-33">§3.3 十方交换</a>' +
+      '<a href="#vision-34">§3.4 三条永不</a>' +
+      '<a href="#vision-35">§3.5 教育宣言</a>' +
+      '<a href="#vision-36">§3.6 计划书档案</a>';
     var triHead = '';
     var triBody = '';
     var flyHtml = '';
+    var layerHtml = '';
+    var rows = '';
     var i;
     for (i = 0; i < tri.length; i++) {
       triHead += '<th>' + esc(tri[i][0]) + '</th>';
@@ -1253,14 +1427,29 @@
     for (i = 0; i < fly.length; i++) {
       flyHtml += '<div class="card"><div class="v-tag">' + esc(fly[i][0]) + '</div><h3>' + esc(fly[i][1]) + '</h3><p>' + esc(fly[i][2]) + '</p><div class="v-who">适合：' + esc(fly[i][3]) + '</div></div>';
     }
+    for (i = 0; i < layers.length; i++) {
+      layerHtml += '<div class="layer-block" id="' + esc(layers[i][0]) + '">' +
+        '<div class="lb-head"><span class="lb-tag">' + esc(layers[i][1]) + '</span>' + esc(layers[i][2]) + '</div>' +
+        '<p>' + esc(layers[i][3]) + '</p>' +
+        '<div class="lb-entry">交换明细见 <a href="#vision-33">§3.3 十方交换表</a></div>' +
+      '</div>';
+    }
+    for (i = 0; i < SWAP_TABLE.length; i++) {
+      rows += '<tr><td>' + esc(SWAP_TABLE[i][0]) + '</td><td>' + esc(SWAP_TABLE[i][1]) + '</td>' +
+        '<td>' + esc(SWAP_TABLE[i][2]) + '</td><td>' + esc(SWAP_TABLE[i][3]) + '</td></tr>';
+    }
+    var nevers = '';
+    for (var n = 0; n < NEVERS.length; n++) nevers += '<li>' + esc(NEVERS[n]) + '</li>';
+
     appView.innerHTML =
       '<section class="page"><div class="wrap">' +
-        pageHead('FOUNDING MEMO', '愿景与合作', '这份筹备计划书是 MicroDuck 造物世界的起点。我们构建的是一套新体系，回应一个社会化问题：市场就业困难，AI 冲击就业。') +
+        pageHead('P.03', '合作与共赢',
+          'Ch.03 合作渠道的深读页：这份筹备计划书是 MicroDuck 造物世界的起点——三层渠道、十方交换、三条永不，全在这页。', tocVision) +
+        '<h3 class="list-title xn" id="vision-31"><span class="lt-no">§3.1</span>切入点 · 时代问题与愿景</h3>' +
         '<div class="card table-card"><div class="table-wrap"><table class="data-table tri-table">' +
           '<thead><tr>' + triHead + '</tr></thead>' +
           '<tbody><tr>' + triBody + '</tr></tbody></table></div></div>' +
-        '<div class="dim-line"></div>' +
-        '<div class="seal-block"><span class="seal-stamp">目标</span>' +
+        '<div class="seal-block" style="margin-top:14px"><span class="seal-stamp">目标</span>' +
           '<h3>一个夏令营，一份可带走的证明</h3>' +
           '<ul>' +
             '<li>形成社会自发动机：面向兴趣浓厚的初高中生筛选放开一部分名额；面向大学生、研究生乃至任何对具身智能感兴趣的社会成员。</li>' +
@@ -1270,51 +1459,48 @@
           '</ul>' +
         '</div>' +
         '<div class="dim-line"></div>' +
-        '<h3 class="list-title">闭环飞轮 · 四路合作</h3>' +
+        '<h3 class="list-title xn" id="vision-32"><span class="lt-no">§3.2</span>三层合作渠道 · 深化</h3>' +
+        layerHtml +
+        '<div class="tbl-cap"><span class="tno">卡组</span>四路合作卡（闭环飞轮 · 逐路对应）</div>' +
         '<div class="v-grid2">' + flyHtml + '</div>' +
         '<div class="dim-line"></div>' +
-        '<div class="seal-block"><span class="seal-stamp">档案</span>' +
-          '<h3>筹备计划书 · 创始原文（节选）</h3>' +
-          '<p class="v-quote">「我们的愿景是构建世界一流产研中心，把专业知识与产业结合起来形成一个产学研真正结合中心。我们的起始切入点是具身智能前沿，黄仁勋 GTC 大会上展示的 MicroDuck。我们的目标是形成社会自发动机，面向兴趣浓厚的初高中生筛选放开一部分名额……希望经过一个夏令营的时间，让大家产生可带走的证明、从零到一的经验，减轻社会中再就职、转型压力，……提前为国家为社会培养一批……接班人。」</p>' +
-        '</div>' +
-        '<div class="btn-row">' +
-          '<a class="btn btn-main" href="#/camp">报名三轨营</a>' +
-          '<a class="btn btn-ghost" href="#/pledge">十方共赢契约表</a>' +
-          '<a class="btn btn-ghost" href="#/open">开源内核</a>' +
-        '</div>' +
-      '</div></section>';
-  }
-
-  function viewPledge() {
-    var rows = '';
-    for (var i = 0; i < SWAP_TABLE.length; i++) {
-      rows += '<tr><td>' + esc(SWAP_TABLE[i][0]) + '</td><td>' + esc(SWAP_TABLE[i][1]) + '</td>' +
-        '<td>' + esc(SWAP_TABLE[i][2]) + '</td><td>' + esc(SWAP_TABLE[i][3]) + '</td></tr>';
-    }
-    var nevers = '';
-    for (var n = 0; n < NEVERS.length; n++) nevers += '<li>' + esc(NEVERS[n]) + '</li>';
-
-    appView.innerHTML =
-      '<section class="page"><div class="wrap">' +
-        pageHead('WIN-WIN CONTRACT', '十方共赢',
-          '每一方都先赢，我们才进场。合法性不能求，只能换——这张契约表就是全部交换结构。') +
+        '<h3 class="list-title xn" id="vision-33"><span class="lt-no">§3.3</span>十方交换</h3>' +
+        '<div class="tbl-cap"><span class="tno">表 3-1</span>十方交换契约表 · 每一方都先赢，我们才进场</div>' +
         '<div class="card table-card"><div class="table-wrap"><table class="swap-table data-table">' +
           '<thead><tr><th>参与方</th><th>付出</th><th>得到</th><th>共赢锚点</th></tr></thead>' +
           '<tbody>' + rows + '</tbody></table></div></div>' +
         '<div class="dim-line"></div>' +
+        '<h3 class="list-title xn" id="vision-34"><span class="lt-no">§3.4</span>三条永不</h3>' +
         '<div class="seal-block">' +
           '<span class="seal-stamp">章程</span>' +
           '<h3>三条永不（写进章程，总舵也不能破）</h3>' +
           '<ul>' + nevers + '</ul>' +
         '</div>' +
         '<div class="dim-line"></div>' +
-        '<h3 class="list-title">教育宣言</h3>' +
+        '<h3 class="list-title xn" id="vision-35"><span class="lt-no">§3.5</span>教育宣言</h3>' +
         '<div class="manifesto">' +
           '<div class="mani-card"><div class="mi-no">PRINCIPLE 01</div><h3>证据先于自信</h3><p>自信不是喊出来的，是做完一件难事之后长出来的。</p></div>' +
           '<div class="mani-card"><div class="mi-no">PRINCIPLE 02</div><h3>身份先于坚持</h3><p>「我是造物者」的身份认同，比任何打卡机制都持久。</p></div>' +
           '<div class="mani-card"><div class="mi-no">PRINCIPLE 03</div><h3>同伴先于老师</h3><p>同一个零件盒前坐过的人，是最好的老师。</p></div>' +
         '</div>' +
+        '<div class="dim-line"></div>' +
+        '<h3 class="list-title xn" id="vision-36"><span class="lt-no">§3.6</span>筹备计划书 · 创始档案</h3>' +
+        '<div class="seal-block" id="v-archive"><span class="seal-stamp">档案</span>' +
+          '<h3>筹备计划书 · 创始原文（节选）</h3>' +
+          '<p class="v-quote">「我们的愿景是构建世界一流产研中心，把专业知识与产业结合起来形成一个产学研真正结合中心。我们的起始切入点是具身智能前沿，黄仁勋 GTC 大会上展示的 MicroDuck。我们的目标是形成社会自发动机，面向兴趣浓厚的初高中生筛选放开一部分名额……希望经过一个夏令营的时间，让大家产生可带走的证明、从零到一的经验，减轻社会中再就职、转型压力，……提前为国家为社会培养一批……接班人。」</p>' +
+        '</div>' +
+        '<div class="btn-row">' +
+          '<a class="btn btn-primary" href="#/camp">报名三轨营</a>' +
+          '<a class="btn btn-ghost" href="#/open">开源内核</a>' +
+          '<a class="btn btn-ghost" href="#/">返回总纲</a>' +
+        '</div>' +
       '</div></section>';
+
+    /* #/vision/:anchor —— 章内锚点落点（首页 Ch.03 表格入口链接直达对应层） */
+    if (anchor) {
+      var el = document.getElementById(anchor);
+      if (el) el.scrollIntoView();
+    }
   }
 
   /* ============================================================
@@ -1381,7 +1567,7 @@
   function viewActivities() {
     appView.innerHTML =
       '<section class="page"><div class="wrap">' +
-        pageHead('EVENTS', '活动',
+        pageHead('P.09', '活动',
           '体验课与赛事都有线上环节，错过有纪要。点「报名」留下联系方式，开场链接在群里发。') +
         rhythmStrip() +
         '<div id="act-list"><p class="empty">正在加载…</p></div>' +
@@ -1496,7 +1682,7 @@
   function viewLibrary() {
     appView.innerHTML =
       '<section class="page"><div class="wrap">' +
-        pageHead('LIBRARY', '内容库',
+        pageHead('P.08', '内容库',
           '连载、日志、白皮书与信任公告，按栏目归档，点开即读。') +
         '<div class="ops-banner">' +
           '<span class="ob-tag">活动预告</span>' +
@@ -1625,7 +1811,7 @@
     }
     appView.innerHTML =
       '<section class="page"><div class="wrap">' +
-        pageHead('BACKSTAGE', '管理指南',
+        pageHead('P.10', '管理指南',
           '数据托管在 Supabase（免费额度）。所有管理在 Supabase Studio 的 Table Editor 里完成；v3 新表需先在 SQL Editor 执行一次 sql/v3-migration.sql。') +
         '<p class="admin-tip">隐私提醒：报名者与答卷者的微信号仅用于开营与邀约联系，请勿外传；数据库已限制匿名端只能写入、不能读取申请表与答卷。</p>' +
         '<div class="grid grid-2">' +
