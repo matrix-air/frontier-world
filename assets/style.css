@@ -1,11 +1,12 @@
 /* ============================================================
- * MicroDuck 造物世界 · v3.5 正式文件风样式（formal + high-density）
+ * MicroDuck 造物世界 · v5 商业官网样式（营销动线 + 工程图纸血统）
  * 三色纪律：暖纸白（底）/ 靛墨蓝（主墨）/ 雏鸭黄（唯一暖色·只给"活的部分"）+ 一枚印章红
- * v3.5 设计令牌：基准 13.5px / 行高 1.62 / h2≤26px / section 纵向 36px /
- *   卡片 14px·8px 方角 / 阴影废除改 1px 实线框 + 表格化分隔 / 按钮方角 6px·主按钮实色 /
- *   section 标题「§N」衬线编号 + 右侧细线贯通（文件感）/ wrap 1180px / 表格 12.5px·浅靛表头
+ * v5 变更：首页改营销动线（hero 鸭图 + 给孩子/给自己/一起做/段位预览）；
+ *   报头 FOUNDING MEMO 撤除（masthead 样式删除）；营销页章节头用 .plain-head（无编号）；
+ *   文档感只保留给 #/vision 合作页（chap-head / 表号 / §编号样式仍在用）。
+ * 设计令牌：基准 13.5px / 行高 1.62 / 卡片 8px 方角 / 1px 实线框 / wrap 1180px / 表格 12.5px
  * 字体：标题宋体（Songti SC serif）/ 正文系统黑体 / 数据·标注·EXP 用本地 IBMPlexMono
- * 移动优先 · 零外部 CDN
+ * 移动优先 · 零外部 CDN · reduced-motion 全兼容
  * ============================================================ */
 
 @font-face {
@@ -117,19 +118,6 @@ input, select, textarea { font-family: inherit; font-size: 1rem; color: var(--in
 @media (max-width: 480px) {
   .logo { font-size: 1rem; }
   .logo .logo-sub { display: none; }
-}
-
-/* ---------- 报头（FOUNDING MEMO 文档头） ---------- */
-.masthead { background: var(--paper-2); border-bottom: 3px double var(--ink); }
-.masthead-inner {
-  max-width: 1180px; margin: 0 auto; padding: 8px 20px;
-  display: flex; align-items: baseline; justify-content: space-between; gap: 12px;
-}
-.masthead-title { font-family: var(--serif); font-weight: 900; font-size: 1.05rem; color: var(--ink-deep); display: flex; align-items: center; gap: 8px; white-space: nowrap; }
-.masthead-title img { width: 20px; height: 20px; border-radius: 4px; border: 1px solid var(--ink); flex: none; }
-.masthead-meta { font-family: var(--mono); font-size: 0.68rem; letter-spacing: 2px; color: var(--ink-soft); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-@media (max-width: 560px) {
-  .masthead-inner { flex-direction: column; gap: 2px; align-items: flex-start; }
 }
 
 /* ---------- 按钮（v3.5 方角·实色） ---------- */
@@ -912,3 +900,191 @@ h3.list-title, .card h3, .post-title, .article-title, .act-title,
 .mani-card h3, .tri-table td h3, .track-card .tk-slogan, .gloss-table .g-term { font-family: var(--sans); }
 h3.list-title { font-weight: 800; }
 .sec-no { font-family: var(--mono); font-weight: 700; letter-spacing: 1px; }
+
+/* ============================================================
+ * v5 商业官网首页（营销动线）
+ * hero 鸭图（工程标注衬底）· 信任条 · 给孩子 / 给自己 / 一起做 / 段位预览 · offer 卡
+ * 390px 不破版 · reduced-motion 不加新动画
+ * ============================================================ */
+
+/* 锚点落点避开吸顶导航（补 v5 新锚点） */
+.aud-sec[id], .vw-fly[id] { scroll-margin-top: 66px; }
+
+/* ---------- 营销页头（无编号普通标题） ---------- */
+.chap-head.plain-head .chap-main h2 { font-family: var(--serif); }
+
+/* ---------- hero：左鸭图（工程标注衬底）+ 右大标语 ---------- */
+.hero-v5 { padding: 22px 0 6px; }
+.hero-grid { display: grid; grid-template-columns: 1fr; gap: 16px; align-items: center; }
+.hero-visual { margin: 0; min-width: 0; }
+.hv-frame {
+  position: relative; overflow: hidden;
+  background-color: var(--ink-deep);
+  background-image:
+    linear-gradient(rgba(245, 241, 232, 0.055) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(245, 241, 232, 0.055) 1px, transparent 1px);
+  background-size: 26px 26px;
+  border: 1.5px solid var(--ink); border-radius: 10px;
+  padding: 16px;
+}
+.hv-frame img { display: block; width: 100%; height: auto; mix-blend-mode: screen; }
+.hv-cross { position: absolute; width: 14px; height: 14px; opacity: 0.5; pointer-events: none; }
+.hv-cross::before { content: ''; position: absolute; left: 50%; top: 0; width: 1px; height: 14px; background: var(--cream); }
+.hv-cross::after  { content: ''; position: absolute; top: 50%; left: 0; height: 1px; width: 14px; background: var(--cream); }
+.hv-cross.hc1 { left: 8px; top: 8px; }
+.hv-cross.hc2 { right: 8px; top: 8px; }
+.hv-cross.hc3 { left: 8px; bottom: 8px; }
+.hv-cross.hc4 { right: 8px; bottom: 8px; }
+.hv-tag {
+  position: absolute; left: 14px; top: 12px; z-index: 2;
+  font-family: var(--mono); font-size: 0.6rem; font-weight: 700; letter-spacing: 2px;
+  color: var(--ink-deep); background: var(--duck); border: 1px solid var(--ink);
+  border-radius: 3px; padding: 2px 8px; white-space: nowrap;
+}
+.hv-anno {
+  position: absolute; z-index: 2;
+  font-family: var(--mono); font-size: 0.6rem; letter-spacing: 1px;
+  color: rgba(245, 241, 232, 0.75); background: rgba(28, 43, 58, 0.6);
+  border: 1px solid rgba(245, 241, 232, 0.28); border-radius: 3px;
+  padding: 2px 7px; white-space: nowrap;
+}
+.hv-anno.a1 { left: 14px; bottom: 14px; }
+.hv-anno.a2 { right: 14px; top: 12px; }
+.hv-anno.a3 { right: 14px; bottom: 14px; }
+.hv-cap { margin-top: 6px; }
+.hero-copy { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; min-width: 0; }
+.hero-copy h1 {
+  font-family: var(--serif); font-weight: 900; letter-spacing: 0.5px;
+  font-size: clamp(1.9rem, 4.6vw, 2.9rem); line-height: 1.22;
+}
+.hero-copy h1 .hl { color: var(--ink); background: linear-gradient(transparent 62%, var(--duck) 62%); padding: 0 2px; }
+.hero-sub { font-size: 1.02rem; color: var(--ink-soft); max-width: 30em; }
+.trust-bar {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px;
+  font-family: var(--mono); font-size: 0.78rem; color: var(--ink-soft);
+  border: 1px dashed var(--line); border-radius: 6px;
+  background: rgba(255, 201, 60, 0.10); padding: 8px 14px;
+}
+.trust-bar b { font-size: 1.02rem; color: var(--ink-deep); margin-right: 5px; }
+.tb-sep { width: 1px; height: 16px; background: var(--line); display: inline-block; }
+@media (max-width: 560px) {
+  .hv-anno.a2 { display: none; }          /* 窄屏收敛标注，防重叠 */
+  .hv-frame { padding: 12px; }
+}
+
+/* ---------- 通用访客段落（kicker + 大标语 + lead） ---------- */
+.aud-sec { padding: 34px 0 6px; }
+.aud-head { margin-bottom: 14px; }
+.aud-kicker {
+  display: inline-block; font-family: var(--mono); font-size: 0.68rem; font-weight: 700;
+  letter-spacing: 3px; color: var(--duck-deep);
+  border: 1px solid var(--line); border-radius: 3px; background: var(--paper-2);
+  padding: 3px 10px; margin-bottom: 10px;
+}
+.aud-head h2 {
+  font-family: var(--serif); font-weight: 900; letter-spacing: 0.5px;
+  font-size: clamp(1.45rem, 3.2vw, 2.05rem); line-height: 1.3;
+}
+.aud-head h2 .hl { color: var(--ink); background: linear-gradient(transparent 62%, var(--duck) 62%); padding: 0 2px; }
+.aud-lead { color: var(--ink-soft); font-size: 0.98rem; max-width: 46em; margin-top: 8px; }
+
+/* 通用小标签（offer 条 / offer 卡共用） */
+.tag-chip {
+  display: inline-block; font-family: var(--mono); font-size: 0.62rem; font-weight: 700;
+  letter-spacing: 2px; color: var(--paper-2); background: var(--ink);
+  padding: 2px 8px; border-radius: 3px; white-space: nowrap;
+}
+
+/* ---------- 给孩子：成长档案三卡 + 双保障条 + 信使 offer 条 ---------- */
+.report-cards { display: grid; grid-template-columns: 1fr; gap: 10px; margin: 4px 0 12px; }
+.rc-card { border: 1px solid var(--line); border-radius: 8px; background: var(--paper-2); padding: 12px 14px; min-width: 0; }
+.rc-card b { display: block; font-family: var(--mono); font-size: 0.95rem; color: var(--ink); }
+.rc-card span { display: block; font-weight: 800; font-size: 0.98rem; margin: 2px 0 4px; }
+.rc-card p { font-size: 0.84rem; color: var(--ink-soft); margin: 0; }
+.kid-strip { display: grid; grid-template-columns: 1fr; gap: 8px; margin-bottom: 12px; }
+.ks-item {
+  border-left: 3px solid var(--duck-deep); border-radius: 0 6px 6px 0;
+  background: rgba(255, 201, 60, 0.08); padding: 8px 12px;
+  font-size: 0.88rem; color: var(--ink-soft);
+}
+.ks-item b { display: block; font-family: var(--mono); font-size: 0.7rem; letter-spacing: 1px; color: var(--ink-deep); margin-bottom: 2px; }
+.offer-banner {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px;
+  border: 1.5px solid var(--ink); border-radius: 8px; background: var(--duck);
+  padding: 11px 15px;
+}
+.offer-banner b { font-size: 0.95rem; flex: 1 1 260px; min-width: 0; }
+.offer-banner em { font-style: normal; font-family: var(--mono); font-weight: 700; font-size: 1.05em; border-bottom: 2px solid var(--ink); }
+.offer-banner a { font-weight: 700; white-space: nowrap; border-bottom: 1.5px solid var(--ink); }
+
+/* ---------- 给自己：三轨卡 + 学员 offer ---------- */
+.track-card .tc-go {
+  display: inline-block; margin-top: 6px; font-size: 0.86rem; font-weight: 700;
+  border-bottom: 1.5px solid var(--duck-deep); overflow-wrap: anywhere;
+}
+.track-card .tc-go:hover { background: rgba(255, 201, 60, 0.35); }
+.you-offers { display: grid; grid-template-columns: 1fr; gap: 10px; margin-top: 12px; }
+.yo-card {
+  border: 1px solid var(--line); border-left: 4px solid var(--duck-deep);
+  border-radius: 0 8px 8px 0; background: var(--paper-2);
+  padding: 12px 14px; display: flex; flex-direction: column; gap: 4px; min-width: 0;
+}
+.yo-card b { font-size: 0.98rem; }
+.yo-card b em, .yo-card span em { font-style: normal; font-family: var(--mono); font-weight: 700; border-bottom: 2px solid var(--ink); }
+.yo-card span { font-size: 0.84rem; color: var(--ink-soft); }
+.yo-card a { font-size: 0.86rem; font-weight: 700; align-self: flex-start; margin-top: 2px; border-bottom: 1.5px solid var(--duck-deep); }
+.yo-card a:hover { background: rgba(255, 201, 60, 0.35); }
+
+/* ---------- 一起做：机构 / 开发者双卡 ---------- */
+.duo-grid { display: grid; grid-template-columns: 1fr; gap: 10px; margin-bottom: 4px; }
+.duo-card h3 { font-size: 1.08rem; }
+.duo-card p { font-size: 0.9rem; margin: 0 0 4px; }
+.duo-card .dc-go {
+  display: inline-block; margin-top: 4px; font-size: 0.88rem; font-weight: 700;
+  border-bottom: 1.5px solid var(--duck-deep); overflow-wrap: anywhere;
+}
+.duo-card .dc-go:hover { background: rgba(255, 201, 60, 0.35); }
+#together .quote-block { margin-top: 14px; }
+
+/* ---------- camp offer 四卡 ---------- */
+.offer-grid { display: grid; grid-template-columns: 1fr; gap: 10px; }
+.offer-card {
+  position: relative; border: 1px solid var(--line); border-top: 3px solid var(--duck-deep);
+  border-radius: 8px; background: var(--paper-2);
+  padding: 12px 13px; display: flex; flex-direction: column; gap: 5px; min-width: 0;
+}
+/* v4 的 tk-tag 只作用于 .track-card；v5 的 duo/offer 卡复用同一枚章，flex 列内不拉伸 */
+.duo-card .tk-tag, .offer-card .tk-tag {
+  font-family: var(--mono); font-size: 0.64rem; letter-spacing: 2px; font-weight: 700;
+  color: var(--paper-2); background: var(--ink); display: inline-block;
+  padding: 2px 9px; border-radius: 4px; align-self: flex-start; white-space: nowrap;
+}
+.yo-card .tag-chip { align-self: flex-start; }
+.offer-card .oc-who { font-family: var(--mono); font-size: 0.66rem; letter-spacing: 1px; color: var(--ink-faint); }
+.offer-card .oc-hook { font-weight: 800; font-size: 0.96rem; line-height: 1.55; }
+.offer-card .oc-hook em { font-style: normal; font-family: var(--mono); color: var(--ink); border-bottom: 2px solid var(--duck); }
+.offer-card .oc-benefit { font-size: 0.8rem; color: var(--ink-soft); margin: 0; flex: 1; }
+.offer-card .oc-go {
+  font-size: 0.84rem; font-weight: 700; align-self: flex-start;
+  border-bottom: 1.5px solid var(--duck-deep); overflow-wrap: anywhere;
+}
+.offer-card .oc-go:hover { background: rgba(255, 201, 60, 0.35); }
+
+/* ---------- vision 页三翼飞轮新家 ---------- */
+.vw-fly { margin: 10px 0 6px; }
+.vw-fly .fw-stage { margin-top: 12px; }
+
+/* ---------- v5 响应式（≥760px 桌面） ---------- */
+@media (min-width: 760px) {
+  .hero-v5 { padding: 30px 0 10px; }
+  .hero-grid { grid-template-columns: 11fr 9fr; gap: 28px; }
+  .report-cards { grid-template-columns: repeat(3, 1fr); }
+  .kid-strip { grid-template-columns: 1fr 1fr; }
+  .you-offers { grid-template-columns: 1fr 1fr; }
+  .duo-grid { grid-template-columns: 1fr 1fr; }
+  .offer-grid { grid-template-columns: repeat(4, 1fr); }
+  .aud-sec { padding: 44px 0 8px; }
+}
+@media (min-width: 900px) and (max-width: 1099px) {
+  .offer-grid { grid-template-columns: repeat(2, 1fr); }   /* 中屏 2×2 更透气 */
+}

@@ -1,8 +1,10 @@
-/* MicroDuck 造物世界 · 前端应用 v4（hash 路由 SPA · 章节头版式）
- * 路由：#/ 首页（五章一页式商业结构总纲，静态内容）、#/test 段位测试（33 题分支问卷 v1.1.0）、
- *       #/growth 成长体系、#/map 作战图谱、#/camp 教育与营地（Ch.04–05 深读 + 报名）、#/open 开源内核（Ch.02 深读）、
- *       #/activities 活动、#/library 内容库、#/library/:id 文章详情、#/vision 合作与共赢（Ch.03 深读，含锚点 #/vision/:id）、
+/* MicroDuck 造物世界 · 前端应用 v5（hash 路由 SPA · 营销动线版式）
+ * 路由：#/ 首页（v5 商业官网 · hero 鸭图 + 给孩子/给自己/一起做/段位预览，静态内容）、#/test 段位测试（33 题分支问卷 v1.1.0）、
+ *       #/growth 成长体系、#/map 作战图谱、#/camp 教育与营地（卖货语气 + 四张 offer 卡 + 报名）、#/open 开源内核（热血微调）、
+ *       #/activities 活动、#/library 内容库、#/library/:id 文章详情、#/vision 合作与共赢（文档感保留页 · 含三翼飞轮大图 + 锚点 #/vision/:id）、
  *       #/pledge 已并入 #/vision（路由别名保留）、#/admin 管理指南。
+ * 版式：营销页（camp/growth/map/library/admin）章节头组件用 pageHeadPlain（无 Ch./P. 编号）；
+ *       文档感只保留给合作页 #/vision（pageHead · P.03）。
  * 数据全部经 window.Api（assets/api.js）；题库 window.QUIZ（assets/quiz-data.js）；
  * FW_CONFIG.SUPABASE 的 url/anonKey 任一为空 = 演示模式。
  * 内容源：MATERIALS-BRIEF.md（数字逐字）；问卷源：microduck-survey/docs/问卷全文-v1.1.0.docx。
@@ -136,10 +138,21 @@
     return h + '</select>';
   }
 
-  /* v4 章节头：左大号编号（Ch./P. 衬线）+ 章名 + 导读 + 右侧页内锚点目录（桌面） */
+  /* v4 章节头：左大号编号（Ch./P. 衬线）+ 章名 + 导读 + 右侧页内锚点目录（桌面）
+   * v5 起仅 #/vision 合作页使用（文档感保留给合作方），营销页一律走 pageHeadPlain。 */
   function pageHead(no, title, desc, toc) {
     return '<div class="chap-head">' +
       '<div class="chap-no" aria-hidden="true">' + esc(no) + '</div>' +
+      '<div class="chap-main"><h2>' + title + '</h2>' +
+      (desc ? '<p class="chap-lead">' + desc + '</p>' : '') +
+      '</div>' +
+      (toc ? '<nav class="chap-toc" aria-label="页内目录">' + toc + '</nav>' : '') +
+      '</div>';
+  }
+
+  /* v5 营销页头：普通小节标题（无 Ch./P. 编号），文档感只留给合作页 */
+  function pageHeadPlain(title, desc, toc) {
+    return '<div class="chap-head plain-head">' +
       '<div class="chap-main"><h2>' + title + '</h2>' +
       (desc ? '<p class="chap-lead">' + desc + '</p>' : '') +
       '</div>' +
@@ -814,7 +827,7 @@
 
     appView.innerHTML =
       '<section class="page"><div class="wrap">' +
-        pageHead('P.05', '成长体系',
+        pageHeadPlain('成长体系',
           '七级段位，每级一段能讲出来的故事。段位永久有效；赛季排行榜每半年重置；个人和组织共用一条经验槽——帮别人升级就是给自己升级。') +
         '<div class="tune-note">EXP 数值待实测调参（方案注明，以书稿版为基准）</div>' +
         '<h3 class="list-title">七级段位</h3>' +
@@ -929,7 +942,7 @@
 
     appView.innerHTML =
       '<section class="page"><div class="wrap">' +
-        pageHead('P.06', '作战图谱',
+        pageHeadPlain('作战图谱',
           '扩张不是勇气问题，是数据批准问题。先看台账，再看地图——光是数据点亮的，铺之前，先验电压。') +
         '<h3 class="list-title">运动路线图</h3>' +
         '<div class="timeline"><div class="card table-card"><div class="table-wrap"><table class="data-table road-table">' +
@@ -1055,6 +1068,17 @@
     '师徒链——学员 → 助教 → 主讲 → 合伙人，帮别人升级就是给自己升级。'
   ];
 
+  /* v5 offer 卡：一句钩子 + 权益 + 入口（激励数字化公开：校园专项/信使/内容共创/魔改） */
+  function offerCard(tag, who, hook, benefit, href, entry) {
+    return '<article class="card offer-card">' +
+      '<span class="tk-tag">' + esc(tag) + '</span>' +
+      '<div class="oc-who">' + esc(who) + '</div>' +
+      '<div class="oc-hook">' + hook + '</div>' +
+      '<p class="oc-benefit">' + esc(benefit) + '</p>' +
+      '<a class="oc-go" href="' + esc(href) + '">' + esc(entry) + '</a>' +
+    '</article>';
+  }
+
   function viewCamp() {
     var trackCards = '';
     for (var t = 0; t < CAMP_TRACKS.length; t++) {
@@ -1108,33 +1132,34 @@
 
     var tocCamp =
       '<span class="toc-cap">本页目录</span>' +
-      '<a href="#camp-41">§4.1 四条产品线</a>' +
-      '<a href="#camp-42">§4.2 五站证据链</a>' +
-      '<a href="#camp-43">§4.3 三轨详卡</a>' +
-      '<a href="#camp-44">§4.4 产品全景</a>' +
-      '<a href="#camp-45">§4.5 亲带一年</a>' +
-      '<a href="#camp-46">§4.6 社团 8 周课表</a>' +
-      '<a href="#camp-51">§5.1 四类营地</a>' +
-      '<a href="#camp-52">§5.2 身份与关系</a>' +
-      '<a href="#camp-53">§5.3 成长档案</a>' +
-      '<a href="#camp-54">§5.4 助教通道</a>' +
+      '<a href="#camp-41">四条路，从兴趣到职业</a>' +
+      '<a href="#camp-42">五站证据链</a>' +
+      '<a href="#camp-43">三条轨道</a>' +
+      '<a href="#camp-44">产品全景与价格</a>' +
+      '<a href="#camp-45">亲带一年</a>' +
+      '<a href="#camp-46">社团 8 周课表</a>' +
+      '<a href="#camp-51">四类营地</a>' +
+      '<a href="#camp-52">身份与关系</a>' +
+      '<a href="#camp-53">成长档案</a>' +
+      '<a href="#camp-54">助教通道</a>' +
+      '<a href="#camp-offers">学费可以挣回来</a>' +
       '<a href="#camp-form-head">报名</a>';
 
     appView.innerHTML =
       '<section class="page"><div class="wrap">' +
-        pageHead('P.02', '教育与营地',
-          '教育设计与营地结构的深读页：四条产品线、五站证据链、三轨详卡、四类营地与身份关系设计，页尾报名。', tocCamp) +
+        pageHeadPlain('教育与营地',
+          '五天，亲手做成一件难事——三条轨道、四类营地、一张明码标价的课表，总有一条路适合你（的孩子）。', tocCamp) +
 
-        '<h3 class="list-title xn" id="camp-41"><span class="lt-no">§4.1</span>四条产品线</h3>' +
-        '<div class="tbl-cap"><span class="tno">表 4-1</span>四条产品线总表（第 ④ 条为规划线 · 筹备中）</div>' +
+        '<h3 class="list-title plain" id="camp-41">四条路，从兴趣到职业</h3>' +
+        '<div class="tbl-cap"><span class="tno">总表</span>四条路一览（第 ④ 条为规划线 · 筹备中，不冒充已开设）</div>' +
         '<div class="card table-card"><div class="table-wrap"><table class="data-table">' +
           '<thead><tr><th>产品线</th><th>对应轨 · 人群</th><th>一句话</th></tr></thead>' +
           '<tbody>' + lineRows + '</tbody></table></div></div>' +
         '<p class="table-foot">第 ④ 条为规划线，未排入首战——宁可慢，不可烂。</p>' +
         '<div class="dim-line"></div>' +
 
-        '<h3 class="list-title xn" id="camp-42"><span class="lt-no">§4.2</span>产品主线 · 五站证据链</h3>' +
-        '<p class="sec-desc" style="margin-bottom:8px">每条产品线都以同一条证据链为交付底座——深浅不同，证据同构：每一站都留下可验收的实物。</p>' +
+        '<h3 class="list-title plain" id="camp-42">五站证据链 · 每一步都留下实物</h3>' +
+        '<p class="sec-desc" style="margin-bottom:8px">每条路都以同一条证据链为交付底座——深浅不同，证据同构：每一站都有可验收的实物交到你手上。</p>' +
         '<div class="chain-bar">' +
           '<div class="chain-cell" title="BOM 清单与到货验收单：15 颗舵机逐个空转测试"><span class="cc-no">01</span><b>采购</b></div>' +
           '<div class="chain-cell" title="装配标定记录 + 首只鸭点亮仪式（装鸭 +100 EXP）"><span class="cc-no">02</span><b>3D 打印装配</b></div>' +
@@ -1146,19 +1171,19 @@
         '<div class="chain-cap">FIVE-STATION EVIDENCE CHAIN · H 250 MM · ZERO TO ONE · 造物世界</div>' +
         '<div class="dim-line"></div>' +
 
-        '<h3 class="list-title xn" id="camp-43"><span class="lt-no">§4.3</span>三轨详卡</h3>' +
+        '<h3 class="list-title plain" id="camp-43">三条轨道 · 选你的那条</h3>' +
         '<p class="sec-desc" style="margin-bottom:10px">兴趣点火、工程成型、落地上路——三条轨道，同一个终点：亲手做成一件难事。任务阶梯 L0–L3 全线贯通：跑通 → 自训 → 自定义 → 真机可选。</p>' +
         '<div class="grid grid-3">' + trackCards + '</div>' +
         '<div class="dim-line"></div>' +
 
-        '<h3 class="list-title xn" id="camp-44"><span class="lt-no">§4.4</span>产品全景与价格</h3>' +
-        '<div class="tbl-cap"><span class="tno">表 4-2</span>产品全景表</div>' +
+        '<h3 class="list-title plain" id="camp-44">产品全景 · 明码标价</h3>' +
+        '<div class="tbl-cap"><span class="tno">价目</span>产品全景 · 每一款都写清人群与交付</div>' +
         '<div class="card table-card"><div class="table-wrap"><table class="price-table data-table">' +
           '<thead><tr><th>产品</th><th>人群</th><th>价格</th><th>交付</th></tr></thead>' +
           '<tbody>' + priceRows + '</tbody></table></div></div>' +
         '<div class="dim-line"></div>' +
 
-        '<h3 class="list-title xn" id="camp-45"><span class="lt-no">§4.5</span>亲带一年 · 三段</h3>' +
+        '<h3 class="list-title plain" id="camp-45">亲带一年 · 导师陪你走一整年</h3>' +
         '<div class="m123">' + m123 + '</div>' +
         '<div class="seal-block" style="margin-top:14px">' +
           '<span class="seal-stamp">红线</span>' +
@@ -1171,16 +1196,16 @@
         '</div>' +
         '<div class="dim-line"></div>' +
 
-        '<h3 class="list-title xn" id="camp-46"><span class="lt-no">§4.6</span>社团 8 周课表</h3>' +
+        '<h3 class="list-title plain" id="camp-46">社团 8 周课表 · 一学期，从零件盒走到 Demo Day</h3>' +
         '<p class="sec-desc" style="margin-bottom:4px">每周 90 分钟，一学期把一只鸭从零件盒走到 Demo Day。每节课固定留下 1 条当堂产物——产物即档案。</p>' +
-        '<div class="tbl-cap"><span class="tno">表 4-3</span>社团 8 周课表（每周 90 分钟 · 每节课 1 条当堂产物）</div>' +
+        '<div class="tbl-cap"><span class="tno">课表</span>每周 90 分钟 · 每节课 1 条当堂产物</div>' +
         '<div class="card table-card"><div class="table-wrap"><table class="price-table data-table" id="camp-week-table">' +
           '<thead><tr><th>周</th><th>课</th><th>内容</th><th>当堂产物</th></tr></thead>' +
           '<tbody>' + weekRows + '</tbody></table></div></div>' +
         '<div class="dim-line"></div>' +
 
-        '<h3 class="list-title xn" id="camp-51"><span class="lt-no">§5.1</span>四类营地与转换</h3>' +
-        '<div class="tbl-cap"><span class="tno">表 5-1</span>四类营地（按人群分层）</div>' +
+        '<h3 class="list-title plain" id="camp-51">四类营地 · 条条有出口</h3>' +
+        '<div class="tbl-cap"><span class="tno">营地</span>四类营 · 按人群分层，出口互通</div>' +
         '<div class="card table-card"><div class="table-wrap"><table class="data-table">' +
           '<thead><tr><th>营</th><th>人群</th><th>定位</th><th>出口</th></tr></thead>' +
           '<tbody>' + typeRows + '</tbody></table></div></div>' +
@@ -1198,7 +1223,7 @@
         '</ol>' +
         '<div class="dim-line"></div>' +
 
-        '<h3 class="list-title xn" id="camp-52"><span class="lt-no">§5.2</span>身份与关系设计</h3>' +
+        '<h3 class="list-title plain" id="camp-52">身份与关系设计 · 归属感是设计出来的</h3>' +
         '<div class="brief-grid">' +
           '<div>' +
             '<div class="tbl-cap"><span class="tno">身份</span>归属设计 · 让「造物者」看得见摸得着</div>' +
@@ -1211,9 +1236,9 @@
         '</div>' +
         '<div class="dim-line"></div>' +
 
-        '<h3 class="list-title xn" id="camp-53"><span class="lt-no">§5.3</span>家长看到的成长档案</h3>' +
+        '<h3 class="list-title plain" id="camp-53">孩子每天的变化，你都看得见</h3>' +
         '<p class="sec-desc" style="margin-bottom:4px">三报节律 + 周五直播 + 结营成长册，全程微信群直达、零新软件——翻群即翻档案。</p>' +
-        '<div class="tbl-cap"><span class="tno">表 5-2</span>三报节律（全程微信群直达）</div>' +
+        '<div class="tbl-cap"><span class="tno">三报</span>晨报 / 日报 / 晚报 · 全程微信群直达</div>' +
         '<div class="card table-card"><div class="table-wrap"><table class="price-table data-table" id="report-table">' +
           '<thead><tr><th>时点</th><th>报</th><th>内容（实物）</th></tr></thead>' +
           '<tbody>' + reportRows + '</tbody></table></div></div>' +
@@ -1224,7 +1249,7 @@
         '<p class="city-note">家长视角只有一件事：孩子的变化看得见。晨报 / 日报 / 晚报 + 可转发的成长册，就是「信任」两个字的实物形态。</p>' +
         '<div class="dim-line"></div>' +
 
-        '<h3 class="list-title xn" id="camp-54"><span class="lt-no">§5.4</span>结营后的助教通道</h3>' +
+        '<h3 class="list-title plain" id="camp-54">结营后的助教通道 · 下一站，站上讲台</h3>' +
         '<div class="card ta-card">' +
           '<span class="tk-tag">TA CHANNEL</span>' +
           '<p class="post-sum" style="margin-top:8px">结营当天宣布助教标准：<b>出勤 100% + 作品达标 + 15 分钟面试</b>——命中即入助教池，每期约 20%。下一座新城开营时，助教就从这里出。</p>' +
@@ -1232,7 +1257,17 @@
         '</div>' +
         '<div class="dim-line"></div>' +
 
-        '<h3 class="list-title xn" id="camp-form-head"><span class="lt-no">报名</span>第 001 只鸭，等你点亮。</h3>' +
+        '<h3 class="list-title plain" id="camp-offers">学费，是可以挣回来的</h3>' +
+        '<p class="sec-desc" style="margin-bottom:10px">四条激励通道全部公开：动动手、动动嘴、动动脑，都有机会把学费挣回来——规则写在明处，欢迎监督。</p>' +
+        '<div class="offer-grid">' +
+          offerCard('校园专项', '电子科大在校生 · 专项通道', '仅<em>成本价</em>入学，优秀者直通讲师。', '结营进助教池，认证后站上讲台带班；在校期间边学边教，履历与收入一起长。', '#/camp', '申请专项 →') +
+          offerCard('信使计划', '每位家长', '分享给同学家长，最高 <em>¥5,000</em> 学费支持。', '孩子身上看得见的变化，就是最可信的转介绍；成单即抵扣，规则公开可查。', '#/camp', '了解玩法 →') +
+          offerCard('内容共创', '全体学员', '你的鸭子视频火了，学费我们出——单条 <em>¥500</em> 返现。', '训练实录 / 出片素材被采用即返现——作业即广告，你拍我们买单，多拍多发。', '#/library', '投稿入口 →') +
+          offerCard('魔改成长', '开发者 · 魔改师', '魔改方案被课程包收录，<em>¥1,000</em> 收录奖励。', '从复刻到创造：署名进 changelog，下期课程用你的方案，你被写进教材。', '#/open', '提交魔改 →') +
+        '</div>' +
+        '<div class="dim-line"></div>' +
+
+        '<h3 class="list-title plain" id="camp-form-head">第 001 只鸭，等你点亮。</h3>' +
         '<p class="sec-desc" style="margin-bottom:14px">提交后由首战城团队 48 小时内联系；也可先做<a href="#/test">段位测试</a>再决定轨道。</p>' +
         '<form id="camp-form" class="card form-card" novalidate>' +
           '<div class="frow">' +
@@ -1311,7 +1346,7 @@
     appView.innerHTML =
       '<section class="page"><div class="wrap">' +
         pageHead('P.07', '开源内核',
-          '社区即课程、贡献即成长。图纸 / 代码 / 课程 / 账本全开源，clone 即拿走整套造物能力——fork 不是拥有，clone 下来改完第一行，才算开始。', tocOpen) +
+          '社区即课程，贡献即成长。图纸 / 代码 / 课程 / 账本全开源，clone 即拿走整套造物能力——你的第一个 PR，就是具身智能的行业入场券。fork 不是拥有，clone 下来改完第一行，才算开始。', tocOpen) +
         '<h3 class="list-title xn" id="open-21"><span class="lt-no">§2.1</span>双仓与月度发版</h3>' +
         '<div class="grid grid-2">' +
           '<div class="card repo-card">' +
@@ -1324,7 +1359,8 @@
           '</div>' +
         '</div>' +
         '<div class="dim-line"></div>' +
-        '<h3 class="list-title xn" id="open-22"><span class="lt-no">§2.2</span>贡献四步闭环</h3>' +
+        '<h3 class="list-title xn" id="open-22"><span class="lt-no">§2.2</span>贡献四步闭环 · 每一步都算数</h3>' +
+        '<p class="sec-desc" style="margin-bottom:6px">在这里，没有人看你背景，只看你提交了什么——四步，从旁观者变成被署名的人。</p>' +
         '<div class="loop-steps">' +
           '<div class="loop-step"><div class="loop-no">1</div><div><h3>认领 good-first-issue</h3><p>从文档翻译、测试补全到任务魔改，总有一张牌桌缺人。</p></div></div>' +
           '<div class="loop-step"><div class="loop-no">2</div><div><h3>提交 PR（代码 / 文档 / 翻译）</h3><p>「你不留痕迹，只可能因为你什么都没提交。」</p></div></div>' +
@@ -1460,6 +1496,46 @@
         '</div>' +
         '<div class="dim-line"></div>' +
         '<h3 class="list-title xn" id="vision-32"><span class="lt-no">§3.2</span>三层合作渠道 · 深化</h3>' +
+        '<div class="vw-fly" id="vision-flywheel">' +
+          '<p class="sec-desc" style="margin-bottom:0">商业模式先画成一张图：一核三翼，开源内核是不变量，三片翼各按各的燃料转——机制不因转速改变。</p>' +
+          '<div class="fw-stage">' +
+            '<svg class="fw-rotor" viewBox="0 0 600 600" aria-hidden="true" focusable="false">' +
+              '<circle cx="300" cy="300" r="272" fill="none" stroke="rgba(36,70,107,0.14)" stroke-width="1" stroke-dasharray="3 9"/>' +
+              '<circle cx="300" cy="300" r="216" fill="none" stroke="rgba(36,70,107,0.30)" stroke-width="2" stroke-dasharray="2 111.4"/>' +
+              '<circle cx="300" cy="300" r="210" fill="none" stroke="#24466B" stroke-width="2"/>' +
+              '<circle cx="302.5" cy="297.5" r="205" fill="none" stroke="rgba(36,70,107,0.35)" stroke-width="1"/>' +
+              '<circle cx="300" cy="300" r="118" fill="none" stroke="rgba(36,70,107,0.22)" stroke-width="1" stroke-dasharray="6 7"/>' +
+              '<g stroke="rgba(36,70,107,0.45)" stroke-width="1.5">' +
+                '<path d="M60 52 v16 M52 60 h16"/>' +
+                '<path d="M540 52 v16 M532 60 h16"/>' +
+                '<path d="M60 532 v16 M52 540 h16"/>' +
+                '<path d="M540 532 v16 M532 540 h16"/>' +
+              '</g>' +
+              '<g fill="#F2A93B" stroke="#24466B" stroke-width="1">' +
+                '<path d="M488.9 207.1 L488.8 191 L475 199 Z"/>' +
+                '<path d="M286 510 L300 518 L300 502 Z"/>' +
+                '<path d="M125.1 182.9 L111.2 191 L125 199 Z"/>' +
+              '</g>' +
+            '</svg>' +
+            '<div class="fw-hub"><b>开源内核</b><span>GitHub + Gitee 双仓<br>月度发版 · 社区即课程</span></div>' +
+            '<div class="fw-wing pos-top">' +
+              '<span class="fww-drive">第一棒 · 资产驱动</span>' +
+              '<span class="fww-name">校园翼</span>' +
+              '<span class="fww-line">燃料：学分课程与案例 → 产出：场地 + 人才</span>' +
+            '</div>' +
+            '<div class="fw-wing pos-rb">' +
+              '<span class="fww-drive">第二棒 · 信任驱动</span>' +
+              '<span class="fww-name">家长翼</span>' +
+              '<span class="fww-line">燃料：信任 → 产出：人口 + 现金流</span>' +
+            '</div>' +
+            '<div class="fw-wing pos-lb">' +
+              '<span class="fww-drive">第三棒 · 交换驱动</span>' +
+              '<span class="fww-name">社会结构翼</span>' +
+              '<span class="fww-line">燃料：对方 KPI 交换 → 产出：合法性</span>' +
+            '</div>' +
+          '</div>' +
+          '<div class="dim-label fw-cap">图 3-1 · 三翼飞轮 · 环向箭头示旋转方向（机制不因转速改变）</div>' +
+        '</div>' +
         layerHtml +
         '<div class="tbl-cap"><span class="tno">卡组</span>四路合作卡（闭环飞轮 · 逐路对应）</div>' +
         '<div class="v-grid2">' + flyHtml + '</div>' +
@@ -1682,7 +1758,7 @@
   function viewLibrary() {
     appView.innerHTML =
       '<section class="page"><div class="wrap">' +
-        pageHead('P.08', '内容库',
+        pageHeadPlain('内容库',
           '连载、日志、白皮书与信任公告，按栏目归档，点开即读。') +
         '<div class="ops-banner">' +
           '<span class="ob-tag">活动预告</span>' +
@@ -1811,7 +1887,7 @@
     }
     appView.innerHTML =
       '<section class="page"><div class="wrap">' +
-        pageHead('P.10', '管理指南',
+        pageHeadPlain('管理指南',
           '数据托管在 Supabase（免费额度）。所有管理在 Supabase Studio 的 Table Editor 里完成；v3 新表需先在 SQL Editor 执行一次 sql/v3-migration.sql。') +
         '<p class="admin-tip">隐私提醒：报名者与答卷者的微信号仅用于开营与邀约联系，请勿外传；数据库已限制匿名端只能写入、不能读取申请表与答卷。</p>' +
         '<div class="grid grid-2">' +

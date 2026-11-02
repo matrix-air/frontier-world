@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <meta name="theme-color" content="#FAF7F0">
-<meta name="description" content="MicroDuck 造物世界——亲手复刻一只真的会走的机械鸭：采购→装配→仿真RL→真机行走，五站全程留下可验收的证据。一人一鸭，人人都是造物者。我们不承诺爱上机器人，只承诺你亲手做成过一件难事。">
-<title>MicroDuck 造物世界 — 一人一鸭，人人都是造物者</title>
+<meta name="description" content="亲手复刻一只会走的机械鸭——五天五站，从零件盒到真机行走，每一步留下可验收的实物。孩子每天的变化你都看得见；你的鸭子视频火了，学费我们出。一人一鸭，人人都是造物者。我们不承诺爱上机器人，只承诺你亲手做成过一件难事。">
+<title>MicroDuck 造物世界 — 亲手复刻一只会走的机械鸭</title>
 <noscript><style>.rv{opacity:1;transform:none}</style></noscript>
 <link rel="icon" type="image/png" href="assets/avatar.png">
 <link rel="stylesheet" href="assets/style.css">
@@ -40,316 +40,159 @@
 </header>
 
 <main>
-  <!-- 报头（一行式文档头 · 双细线） -->
-  <div class="masthead">
-    <div class="masthead-inner">
-      <div class="masthead-title"><img src="assets/avatar.png" alt="">MicroDuck 造物世界 · 运动简报</div>
-      <div class="masthead-meta">FOUNDING MEMO · v4.0 · 2026-11</div>
-    </div>
-  </div>
-
-  <!-- ============ Ch.01 商业模式 · 三翼飞轮（hero 与第一章合并 · 全站唯一 bold 元素） ============ -->
-  <section id="top" class="hero">
-    <div class="wrap">
-      <div class="chap-head rv" id="ch1">
-        <div class="chap-no" aria-hidden="true">Ch.01</div>
-        <div class="chap-main">
-          <h2>商业模式 · 三翼飞轮</h2>
-          <p class="chap-lead">一核三翼：开源内核是不变量，三片翼各按各的燃料转。我们不雇佣世界，我们装备世界。</p>
+  <!-- ============ HERO · 亲手复刻一只会走的机械鸭 ============ -->
+  <section id="top" class="hero hero-v5">
+    <div class="wrap hero-grid">
+      <figure class="hero-visual rv" id="hero-duck">
+        <div class="hv-frame">
+          <i class="hv-cross hc1" aria-hidden="true"></i><i class="hv-cross hc2" aria-hidden="true"></i>
+          <i class="hv-cross hc3" aria-hidden="true"></i><i class="hv-cross hc4" aria-hidden="true"></i>
+          <span class="hv-tag">MD-01 · 工程标注 · 1:1 复刻件</span>
+          <img src="assets/microduck-hero.png" alt="MicroDuck MD-01 机械鸭：15 颗舵机，仿真训练策略驱动真机行走" width="1600" height="1600">
+          <span class="hv-anno a1">H 250 MM · ZERO TO ONE</span>
+          <span class="hv-anno a2">SERVO ×15 · 空转测试全过</span>
+          <span class="hv-anno a3">SIM → REAL · obs[1,61] → act[1,14]</span>
         </div>
-        <nav class="chap-toc" aria-label="本页目录">
-          <span class="toc-cap">本页目录</span>
-          <a href="#ch1">Ch.01 商业模式 · 三翼飞轮</a>
-          <a href="#ch2">Ch.02 引流设计</a>
-          <a href="#ch3">Ch.03 合作渠道</a>
-          <a href="#ch4">Ch.04 教育设计</a>
-          <a href="#ch5">Ch.05 营地结构</a>
-          <a href="#appendix">附录 · 术语速查</a>
-        </nav>
-      </div>
-
-      <div class="hero-line rv">
-        <h1>一人一鸭，人人都是<span class="hl">造物者</span></h1>
-        <div class="hero-side">
-          <div class="badge rv"><span class="pulse-dot"></span>2027 寒 · 双城首战（成都 + 杭州）· 报名意向征集中</div>
-          <div class="hero-cta rv">
-            <a class="btn btn-primary" href="#/test">做 33 题段位测试</a>
-            <a class="btn btn-ghost" href="#/camp">报名三轨营</a>
-          </div>
+        <figcaption class="dim-label hv-cap">图 0 · 你五天后亲手点亮的那只鸭（官方渲染件）</figcaption>
+      </figure>
+      <div class="hero-copy">
+        <div class="badge rv"><span class="pulse-dot"></span>2027 寒 · 双城首战（成都 + 杭州）· 报名意向征集中</div>
+        <h1 class="rv">亲手复刻一只<br><span class="hl">会走的机械鸭</span></h1>
+        <p class="hero-sub rv">把「我能行」变成可验证的证据：五天五站，从零件盒到真机行走，每一步都留下可验收的实物。</p>
+        <div class="hero-cta rv">
+          <a class="btn btn-primary" href="#/test">做 33 题段位测试</a>
+          <a class="btn btn-ghost" href="#/camp">报名训练营</a>
+        </div>
+        <div class="trust-bar rv">
+          <span class="tb-item"><b>$2.6M</b>官方首售</span>
+          <i class="tb-sep" aria-hidden="true"></i>
+          <span class="tb-item"><b>149 项</b>复刻验证全过</span>
+          <i class="tb-sep" aria-hidden="true"></i>
+          <span class="tb-item"><b>942 项</b>测试开源</span>
         </div>
       </div>
-
-      <h3 class="list-title xn rv" id="ch1-flywheel"><span class="lt-no">§1.1</span>三翼飞轮</h3>
-      <div class="fw-stage rv" id="flywheel">
-        <!-- 转子：双细线主环 + 内虚线构造环 + 刻度环 + 三枚环向箭头（CSS 缓慢旋转 · reduced-motion 停） -->
-        <svg class="fw-rotor" viewBox="0 0 600 600" aria-hidden="true" focusable="false">
-          <circle cx="300" cy="300" r="272" fill="none" stroke="rgba(36,70,107,0.14)" stroke-width="1" stroke-dasharray="3 9"/>
-          <circle cx="300" cy="300" r="216" fill="none" stroke="rgba(36,70,107,0.30)" stroke-width="2" stroke-dasharray="2 111.4"/>
-          <circle cx="300" cy="300" r="210" fill="none" stroke="#24466B" stroke-width="2"/>
-          <circle cx="302.5" cy="297.5" r="205" fill="none" stroke="rgba(36,70,107,0.35)" stroke-width="1"/>
-          <circle cx="300" cy="300" r="118" fill="none" stroke="rgba(36,70,107,0.22)" stroke-width="1" stroke-dasharray="6 7"/>
-          <g stroke="rgba(36,70,107,0.45)" stroke-width="1.5">
-            <path d="M60 52 v16 M52 60 h16"/>
-            <path d="M540 52 v16 M532 60 h16"/>
-            <path d="M60 532 v16 M52 540 h16"/>
-            <path d="M540 532 v16 M532 540 h16"/>
-          </g>
-          <g fill="#F2A93B" stroke="#24466B" stroke-width="1">
-            <path d="M488.9 207.1 L488.8 191 L475 199 Z"/>
-            <path d="M286 510 L300 518 L300 502 Z"/>
-            <path d="M125.1 182.9 L111.2 191 L125 199 Z"/>
-          </g>
-        </svg>
-        <div class="fw-hub"><b>开源内核</b><span>GitHub + Gitee 双仓<br>月度发版 · 社区即课程</span></div>
-        <div class="fw-wing pos-top">
-          <span class="fww-drive">第一棒 · 资产驱动</span>
-          <span class="fww-name">校园翼</span>
-          <span class="fww-line">燃料：学分课程与案例 → 产出：场地 + 人才</span>
-        </div>
-        <div class="fw-wing pos-rb">
-          <span class="fww-drive">第二棒 · 信任驱动</span>
-          <span class="fww-name">家长翼</span>
-          <span class="fww-line">燃料：信任 → 产出：人口 + 现金流</span>
-        </div>
-        <div class="fw-wing pos-lb">
-          <span class="fww-drive">第三棒 · 交换驱动</span>
-          <span class="fww-name">社会结构翼</span>
-          <span class="fww-line">燃料：对方 KPI 交换 → 产出：合法性</span>
-        </div>
-      </div>
-      <div class="dim-label fw-cap">图 1-1 · 三翼飞轮 · 环向箭头示旋转方向（机制不因转速改变）</div>
-
-      <h3 class="list-title xn rv" id="ch1-wings"><span class="lt-no">§1.2</span>三翼一览与顺序纪律</h3>
-      <div class="brief-grid">
-        <div class="rv">
-          <div class="tbl-cap"><span class="tno">表 1-1</span>三翼一览：驱动 · 燃料 · 产出</div>
-          <div class="table-wrap">
-            <table class="data-table">
-              <thead><tr><th>翼</th><th>驱动</th><th>燃料</th><th>产出</th></tr></thead>
-              <tbody>
-                <tr><td><b>校园翼</b></td><td>资产驱动</td><td>学分课程与案例</td><td>场地 + 人才</td></tr>
-                <tr><td><b>家长翼</b></td><td>信任驱动</td><td>信任</td><td>人口 + 现金流</td></tr>
-                <tr><td><b>社会结构翼</b></td><td>交换驱动</td><td>对方 KPI 交换</td><td>合法性</td></tr>
-              </tbody>
-            </table>
-          </div>
-          <div class="tbl-cap"><span class="tno">纪律</span>三翼顺序 · 三棒接力（排死）</div>
-          <ol class="rule-list">
-            <li><b>第一棒 校园翼（2026 Q4 – 2027 Q1）：</b>产出场地 + 人才管道 + 案例 + 助教池——先造原料再开炉。</li>
-            <li><b>第二棒 家长翼（2027 寒假首战 · 成都 + 杭州）：</b>产出人口 + 现金流。</li>
-            <li><b>第三棒 社会结构翼（2027 起持续）：</b>拿前两棒成绩单换背书，产出合法性。</li>
-            <li><b>三翼不能一起上。</b>顺序错了的规模是加速死亡——先有信任的骨架，再长规模的肉。</li>
-          </ol>
-        </div>
-        <aside class="rv">
-          <div class="tbl-cap"><span class="tno">表 1-2</span>公开数据锚点</div>
-          <div class="table-wrap">
-            <table class="data-table stat-table">
-              <tbody>
-                <tr><td>官方首售</td><td class="num t-num">$2.6M · ≈6500 台 / 24h</td></tr>
-                <tr><td>真机门槛</td><td class="num t-num">≈¥3500 → 主线 sim-only</td></tr>
-                <tr><td>本机复刻验证</td><td class="num t-num">149 项全过</td></tr>
-                <tr><td>开源测试</td><td class="num t-num">942 项 · 19 Rust crate · 9 ONNX 策略</td></tr>
-                <tr><td>自训实录</td><td class="num t-num">−0.20 → +13.74（峰值 +16.11）</td></tr>
-                <tr><td>复刻成本</td><td class="num t-num">≈¥4040 vs 官方 ≈¥3500</td></tr>
-                <tr><td>万台自研</td><td class="num t-num">可压 ¥1600–2400</td></tr>
-                <tr><td>许可</td><td class="num t-num">软件 Apache-2.0 · 结构 CC BY-SA-NC</td></tr>
-                <tr><td>双城首战</td><td class="num t-num">成都 + 杭州 · 2027 寒</td></tr>
-                <tr><td>路线</td><td class="num t-num">2026 Q4 内核贯通 → 2028+ 20+ 城</td></tr>
-              </tbody>
-            </table>
-          </div>
-          <p class="stat-note">故事标【演绎】，数字没标——以上全部出自工程实测与公开记录。</p>
-        </aside>
-      </div>
-      <div class="chap-more rv">详见 → <a href="#/map">P.06 作战图谱（三翼打法 · 四道闸口 · 分区地图）</a></div>
     </div>
   </section>
 
-  <!-- ============ Ch.02 引流设计 ============ -->
-  <section id="ch2" class="sec">
+  <!-- ============ 给孩子（家长动线） ============ -->
+  <section id="kids" class="aud-sec">
     <div class="wrap">
-      <div class="chap-head rv">
-        <div class="chap-no" aria-hidden="true">Ch.02</div>
-        <div class="chap-main">
-          <h2>引流设计</h2>
-          <p class="chap-lead">引流不靠买量：一层内容资产持续分发，一层开源社区数据飞轮——产物即传播物，作业即广告。</p>
+      <div class="aud-head" data-stagger>
+        <span class="aud-kicker rv">FOR YOUR KID · 给孩子</span>
+        <h2 class="rv">把孩子的手，从屏幕里<span class="hl">抢回来</span></h2>
+        <p class="aud-lead rv">屏幕给答案，双手给本事。我们不承诺孩子爱上机器人，只承诺 TA 亲手做成过一件难事——而且每一天的变化，你都看得见。</p>
+      </div>
+      <div class="report-cards" data-stagger>
+        <div class="rc-card rv"><b>每天 15 秒</b><span>孩子的鸭子视频</span><p>从乱蹬到会走，进步全录下来，随手转给家里人。</p></div>
+        <div class="rc-card rv"><b>每天一张</b><span>训练曲线</span><p>−0.20 → +13.74——曲线，就是成长的体检图。</p></div>
+        <div class="rc-card rv"><b>每天三行</b><span>排障日志</span><p>今天卡在哪、怎么解决的。工程思维，看得见摸得着。</p></div>
+      </div>
+      <div class="kid-strip" data-stagger>
+        <div class="ks-item rv"><b>结营成长册</b>时间线 + 全部视频 + 讲师总评，一条链接可转发——翻群即翻档案。</div>
+        <div class="ks-item rv"><b>安全交付</b>家长知情同意书 + 开营前试运行日先行：孩子的安全，排在所有数字前面。</div>
+      </div>
+      <div class="offer-banner rv">
+        <span class="tag-chip">信使计划</span>
+        <b>把这件事分享给孩子同学家长，最高 <em>¥5,000</em> 学费支持。</b>
+        <a href="#/camp">了解玩法 →</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ 给自己（学生 / 年轻人动线） ============ -->
+  <section id="you" class="aud-sec">
+    <div class="wrap">
+      <div class="aud-head" data-stagger>
+        <span class="aud-kicker rv">FOR YOU · 给自己</span>
+        <h2 class="rv">五天，亲手<span class="hl">点亮</span>自己的鸭</h2>
+        <p class="aud-lead rv">简历可以修饰，作品不会说谎。选一条轨道下去，把「我会具身智能」变成拿得出手的证据。</p>
+      </div>
+      <div class="grid grid-3" data-stagger>
+        <article class="card track-card rv">
+          <span class="tk-tag">TRACK A · 兴趣点火</span>
+          <div class="tk-people">初三 – 高一 · 5 天日营</div>
+          <div class="tk-slogan">「亲手造出你的第一只 AI 机器人」</div>
+          <a class="tc-go" href="#/camp">这条轨道适合我 →</a>
+        </article>
+        <article class="card track-card hot rv">
+          <span class="tk-tag">TRACK B · 工程成型</span>
+          <div class="tk-people">高二 – 大一 · 6 天</div>
+          <div class="tk-slogan">「从复刻到创造，只差一个寒假」</div>
+          <a class="tc-go" href="#/camp">这条轨道适合我 →</a>
+        </article>
+        <article class="card track-card rv">
+          <span class="tk-tag">TRACK C · 落地上路</span>
+          <div class="tk-people">大二 · 研究生 · 职场 · 6 天 + 4 周陪跑</div>
+          <div class="tk-slogan">「把一只鸭子，做成一门生意」</div>
+          <a class="tc-go" href="#/camp">这条轨道适合我 →</a>
+        </article>
+      </div>
+      <div class="you-offers" data-stagger>
+        <div class="yo-card rv">
+          <span class="tag-chip">内容共创</span>
+          <b>你的鸭子视频火了，学费我们出。</b>
+          <span>训练实录与出片素材被采用，单条 <em>¥500</em> 返现——多拍多发，营期费用自己挣。</span>
+          <a href="#/camp">投稿入口 →</a>
+        </div>
+        <div class="yo-card rv">
+          <span class="tag-chip">电子科大在校专项</span>
+          <b>仅成本价入学，优秀者直通讲师。</b>
+          <span>校内专项通道结营进助教池，下一站，站上讲台带自己的班。</span>
+          <a href="#/camp">申请专项 →</a>
         </div>
       </div>
+    </div>
+  </section>
 
-      <h3 class="list-title xn rv"><span class="lt-no">§2.1</span>两层引流结构</h3>
-      <div class="table-wrap rv">
-        <table class="data-table">
-          <thead><tr><th>层</th><th>载体</th><th>内容资产</th><th>循环机制</th></tr></thead>
-          <tbody>
-            <tr><td><b>① 主流媒体与直播平台</b></td><td>短视频 · 直播 · 纪录片</td><td>训练实录 · 结营纪录片 · 一键出片 15s</td><td>产物即传播物 · 作业即广告 · 内容资产持续分发</td></tr>
-            <tr><td><b>② 开源社区</b></td><td>GitHub · Gitee 双仓</td><td>贡献记录 · 作品 · 数据集 · 课程包迭代</td><td>数据飞轮闭环 · 持续性构建</td></tr>
-          </tbody>
-        </table>
+  <!-- ============ 一起做（机构 / 开发者动线） ============ -->
+  <section id="together" class="aud-sec">
+    <div class="wrap">
+      <div class="aud-head" data-stagger>
+        <span class="aud-kicker rv">BUILD WITH US · 一起做</span>
+        <h2 class="rv">我们不雇佣世界，我们<span class="hl">装备世界</span></h2>
+        <p class="aud-lead rv">机构找新品类，开发者找平台——每一层的账都先算赢，再把这只鸭一起推向更多城。</p>
       </div>
-      <p class="mission-mini rv"><b>反屏幕运动 · </b>把孩子的手从屏幕里抢回来，放到真实世界里。媒体免费报道的使命叙事，也是家长最深的共鸣——屏幕给答案，双手给本事。</p>
-
-      <h3 class="list-title xn rv"><span class="lt-no">§2.2</span>数据飞轮闭环</h3>
-      <div class="loop-ring rv">
-        <span class="lr-tag">闭环</span><span class="wc-chip">贡献</span><span class="wc-arrow">→</span><span class="wc-chip">作品</span><span class="wc-arrow">→</span><span class="wc-chip">数据</span><span class="wc-arrow">→</span><span class="wc-chip">课程迭代</span><span class="wc-arrow">→</span><span class="wc-chip">新贡献者</span><span class="wc-arrow lr-back">↺ 回到贡献</span>
+      <div class="duo-grid" data-stagger>
+        <article class="card duo-card rv">
+          <span class="tk-tag">机构 · 学校 · 企业</span>
+          <h3>把具身智能新品类，开进你的地盘</h3>
+          <p>工程师与课程包我们出，场地与生源你出：联培共建、微专业开设、课程包授权——对方的 KPI 先赢，我们才进场。</p>
+          <a class="dc-go" href="#/vision">合作模式详读 →</a>
+        </article>
+        <article class="card duo-card rv">
+          <span class="tk-tag">开发者 · 极客 · 老师</span>
+          <h3>图纸代码全开源，魔改成你的原创</h3>
+          <p>clone 即拿走整套造物能力；名师讲堂有分红，魔改作品上原创平台——你尽管改，我们帮你卖。</p>
+          <a class="dc-go" href="#/open">开源内核入口 →</a>
+        </article>
       </div>
-      <p class="sec-desc rv">闭环之外还有持续性构建：课程包公开版本号迭代，贡献者进 changelog——数据反哺课程，课程反哺社区。</p>
-
-      <h3 class="list-title xn rv"><span class="lt-no">§2.3</span>开源态度宣言</h3>
       <div class="quote-block rv">
         <p class="qb-text">「不惧被模仿。模仿成功了，是替我们做宣传；模仿受挫了，说明存在能力缺口——欢迎来我们这里补齐。」</p>
         <div class="qb-src">—— MicroDuck 开源态度宣言</div>
       </div>
-      <div class="chap-more rv">详见 → <a href="#/open">P.07 开源内核（数据飞轮全貌）</a> · <a href="#/library">P.08 内容库（纪录片 · 连载 · 白皮书）</a></div>
     </div>
   </section>
 
-  <!-- ============ Ch.03 合作渠道 ============ -->
-  <section id="ch3" class="sec">
+  <!-- ============ 成长体系预览 ============ -->
+  <section id="ranks" class="aud-sec">
     <div class="wrap">
-      <div class="chap-head rv">
-        <div class="chap-no" aria-hidden="true">Ch.03</div>
-        <div class="chap-main">
-          <h2>合作渠道</h2>
-          <p class="chap-lead">三层渠道，每一层先算对方的账——对方先赢，我们才进场；合法性不能求，只能换。</p>
-        </div>
+      <div class="aud-head" data-stagger>
+        <span class="aud-kicker rv">GROWTH · 成长体系</span>
+        <h2 class="rv">七级段位，每级一段<span class="hl">讲得出</span>的故事</h2>
+        <p class="aud-lead rv">青铜 · 见习造物者，到传奇 · 具身智能行业领军人——段位终身有效，排名会刷新，足迹不会。</p>
       </div>
-
-      <h3 class="list-title xn rv"><span class="lt-no">§3.1</span>三层合作渠道</h3>
-      <div class="table-wrap rv">
-        <table class="data-table">
-          <thead><tr><th>渠道层</th><th>合作方式</th><th>交换逻辑（一句）</th><th>入口</th></tr></thead>
-          <tbody>
-            <tr><td><b>机构</b></td><td>联培 · 分红 · 协议约束</td><td>具身智能新品类与高客单产品线归对方，工程师与课程包由我方出。</td><td><a href="#/vision/v-org">详见机构层 →</a></td></tr>
-            <tr><td><b>家长</b></td><td>传播的一环</td><td>孩子身上看得见的变化，就是最可信的转介绍。</td><td><a href="#/vision/v-parent">详见家长层 →</a></td></tr>
-            <tr><td><b>能力强的个人</b></td><td>共同分红 · 讲师与合伙人通道</td><td>一条经验槽：帮别人升级就是给自己升级。</td><td><a href="#/vision/v-person">详见个人层 →</a></td></tr>
-          </tbody>
-        </table>
+      <div class="rank-strip rv">
+        <span class="rank-chip"><b>L1</b>青铜</span><span class="rank-arrow">→</span>
+        <span class="rank-chip"><b>L2</b>白银</span><span class="rank-arrow">→</span>
+        <span class="rank-chip"><b>L3</b>黄金</span><span class="rank-arrow">→</span>
+        <span class="rank-chip"><b>L4</b>铂金</span><span class="rank-arrow">→</span>
+        <span class="rank-chip"><b>L5</b>钻石</span><span class="rank-arrow">→</span>
+        <span class="rank-chip"><b>L6</b>王者</span><span class="rank-arrow">→</span>
+        <span class="rank-chip"><b>L7</b>传奇</span>
       </div>
-      <div class="chap-more rv">详见 → <a href="#/vision">P.03 合作与共赢（三层详述 · 十方交换 · 三条永不 · 计划书档案）</a></div>
-    </div>
-  </section>
-
-  <!-- ============ Ch.04 教育设计 ============ -->
-  <section id="ch4" class="sec">
-    <div class="wrap">
-      <div class="chap-head rv">
-        <div class="chap-no" aria-hidden="true">Ch.04</div>
-        <div class="chap-main">
-          <h2>教育设计</h2>
-          <p class="chap-lead">四条产品线覆盖兴趣启蒙到职业落地；前三条对应三轨营已排期，第四条诚实标注筹备中。</p>
-        </div>
-      </div>
-
-      <h3 class="list-title xn rv"><span class="lt-no">§4.1</span>四条产品线</h3>
-      <div class="table-wrap rv">
-        <table class="data-table">
-          <thead><tr><th>产品线</th><th>对应轨 · 人群</th><th>一句话</th></tr></thead>
-          <tbody>
-            <tr><td><b>① 通识兴趣培养</b></td><td>A 轨 · 初三–高一</td><td>亲手造出你的第一只 AI 机器人——5 天日营，从零件盒到会走的鸭子。</td></tr>
-            <tr><td><b>② 微专业开设培养</b></td><td>B 轨 · 高校共建 · 高二–大一</td><td>从复刻到创造，只差一个寒假；学分课程共建，Demo Day 当场路演。</td></tr>
-            <tr><td><b>③ 开源社区联合培养</b></td><td>C 轨 · 社区贡献通道 · 大二 / 研究生 / 职场</td><td>把一只鸭子做成一门生意——营后 4 周陪跑，贡献进社区履历。</td></tr>
-            <tr><td><b>④ 规划中</b> <span class="stamp-prep">筹备中 · 2027 后排期</span></td><td>—</td><td>AI agent 开发设计课程 · 高中数物化教育课程（尚未开设，2027 后排期）。</td></tr>
-          </tbody>
-        </table>
-      </div>
-      <p class="table-foot rv">第 ④ 条为规划线，未排入首战——宁可慢，不可烂。</p>
-      <div class="chap-more rv">详见 → <a href="#/camp">P.02 教育与营地（产品详表 · 8 周课表 · 报名）</a></div>
-    </div>
-  </section>
-
-  <!-- ============ Ch.05 营地结构 ============ -->
-  <section id="ch5" class="sec">
-    <div class="wrap">
-      <div class="chap-head rv">
-        <div class="chap-no" aria-hidden="true">Ch.05</div>
-        <div class="chap-main">
-          <h2>营地结构</h2>
-          <p class="chap-lead">四类营按人群分层；③与④之间通道常开，可双向转换——今天社团里的学员，就是四年后新课市的助教与主讲。</p>
-        </div>
-      </div>
-
-      <h3 class="list-title xn rv"><span class="lt-no">§5.1</span>四类营地与转换</h3>
-      <div class="table-wrap rv">
-        <table class="data-table">
-          <thead><tr><th>营</th><th>人群</th><th>定位</th><th>出口</th></tr></thead>
-          <tbody>
-            <tr><td><b>① 通识兴趣营</b></td><td>初三 – 高一</td><td>兴趣点火 · 5 天日营</td><td>→ 助教池（每期约 20%）</td></tr>
-            <tr><td><b>② 微专业工程营</b></td><td>高二 – 大一</td><td>工程成型 · 6 天</td><td>→ 助教池（每期约 20%）</td></tr>
-            <tr><td><b>③ 落地联培营</b></td><td>大二 · 研究生 · 职场</td><td>落地上路 · 6 天 + 4 周陪跑</td><td>→ 主讲（双城认证）→ 城市合伙人</td></tr>
-            <tr><td><b>④ 讲师合伙人营</b></td><td>助教 · 讲师 · 城市合伙人</td><td>认证开点 · 持牌经营</td><td>→ 城市节点 / 分部共建</td></tr>
-          </tbody>
-        </table>
-      </div>
-      <div class="transfer-diagram rv">
-        <div class="td-box">
-          <div class="td-no">CAMP ③</div>
-          <b>落地联培营</b>
-          <p>大二 · 研究生 · 职场。6 天 + 4 周陪跑：从产品到开城，营后上路。</p>
-        </div>
-        <div class="td-mid">
-          <div class="td-arrow"><span class="dg">→</span><b>晋升：</b>学员达标，转入助教 / 讲师</div>
-          <div class="td-arrow"><span class="dg">←</span><b>回炉：</b>讲师可回炉落地营深造</div>
-        </div>
-        <div class="td-box">
-          <div class="td-no">CAMP ④</div>
-          <b>讲师合伙人营</b>
-          <p>助教 · 讲师 · 城市合伙人。认证、开点、持牌——把闸口交到你手里。</p>
-        </div>
-      </div>
-      <ol class="rule-list rv">
-        <li><b>③ 与 ④ 在条件合适时可相互转换</b>，通道常开，不设一次性门槛。</li>
-        <li><b>转换双向：</b>学员达标 → 助教 / 讲师；讲师可回炉落地营深造。</li>
-      </ol>
-
-      <h3 class="list-title xn rv"><span class="lt-no">§5.2</span>身份与关系设计</h3>
-      <div class="brief-grid">
-        <div class="rv">
-          <div class="tbl-cap"><span class="tno">身份</span>归属设计 · 让「造物者」看得见摸得着</div>
-          <ol class="rule-list">
-            <li><b>Duck # 编号终身制</b>——报名即发实体徽章，编号永久保留。</li>
-            <li><b>七级段位资产</b>——青铜到传奇，段位终身有效；排名会刷新，足迹不会。</li>
-            <li><b>首只鸭点亮仪式</b>——开营夜全场熄灯，每人点亮自己的鸭。</li>
-            <li><b>成长档案</b>——三报节律 + 结营成长册，翻群即翻档案。</li>
-            <li><b>造物者节</b>——每年 1 月首战开幕日：年度大促 + 限定款 + 限定徽章。</li>
-          </ol>
-        </div>
-        <div class="rv">
-          <div class="tbl-cap"><span class="tno">关系</span>网络设计 · 让每个人挂在一张网上</div>
-          <ol class="rule-list">
-            <li><b>社团</b>——校园翼 20 校社团分部，一校一据点。</li>
-            <li><b>战队</b>——区域赛与校际对抗的竞赛战队。</li>
-            <li><b>城市节点</b>——Chapter Kit 开办章节，城市分部自治。</li>
-            <li><b>alumni 网络</b>——老学员网络，接转介绍与招聘。</li>
-            <li><b>师徒链</b>——学员 → 助教 → 主讲 → 合伙人，帮别人升级就是给自己升级。</li>
-          </ol>
-        </div>
-      </div>
-      <div class="chap-more rv">详见 → <a href="#/camp">P.02 教育与营地（营地详表 · 成长档案 · 报名）</a> · <a href="#/growth">P.05 成长体系（七级段位）</a></div>
-    </div>
-  </section>
-
-  <!-- ============ 附录 · 术语速查 ============ -->
-  <section id="appendix" class="sec">
-    <div class="wrap">
-      <h3 class="list-title xn rv" id="appendix-gloss"><span class="lt-no">附</span>术语速查</h3>
-      <p class="sec-desc rv">黑话 → 一句话定义（公开安全版），详情见工程白皮书与内容库。</p>
-      <div class="tbl-cap rv"><span class="tno">附表 1</span>术语速查（公开安全版）</div>
-      <div class="card table-card rv">
-        <div class="table-wrap">
-          <table class="data-table gloss-table">
-            <thead><tr><th>术语</th><th>定义</th><th>术语</th><th>定义</th></tr></thead>
-            <tbody>
-              <tr><td class="g-term">一人一鸭</td><td class="g-def">运动总纲：每人亲手复刻一只开源机械鸭，复刻 → 魔改 → 原创三级进阶。</td><td class="g-term">复刻权</td><td class="g-def">图纸 / 代码 / 课程 / 账本全开源，clone 即拿走整套造物能力（区别于卖整机）。</td></tr>
-              <tr><td class="g-term">一核三翼</td><td class="g-def">开源内核是不变量（双仓 / 月度发版 / 社区即课程）；家长翼 · 校园翼 · 社会结构翼各按各的燃料转。</td><td class="g-term">段位</td><td class="g-def">七级成长体系：青铜 · 见习造物者 → 传奇 · 具身智能行业领军人，段位终身有效。</td></tr>
-              <tr><td class="g-term">五幕关卡</td><td class="g-def">新手村 → 工坊副本 → 竞技场 → 总决赛 → 开放世界（装鸭 → 魔改 → 仿真 / 区域赛 → 2028 总决赛 → 营后世界）。</td><td class="g-term">四道闸口</td><td class="g-def">扩张审批线：满班率、口碑、获客成本、转介绍四项过闸，才准开下一座城。</td></tr>
-              <tr><td class="g-term">复利设计</td><td class="g-def">判别三问：动作结束一周后留下什么 / 让下期更容易吗 / 十年后还在产生价值吗。</td><td class="g-term">五大复利资产</td><td class="g-def">人口 · 内容 · 数据 · 权威 · 网络——五类资产逐期变厚。</td></tr>
-              <tr><td class="g-term">反屏幕运动</td><td class="g-def">使命叙事：把孩子的手从屏幕里抢回来，放到真实世界里。</td><td class="g-term">会员编号制</td><td class="g-def">Duck #0001 起实体徽章，报名即发，编号永久保留。</td></tr>
-              <tr><td class="g-term">Chapter Kit</td><td class="g-def">自助开办包：把「加盟」重构为「开办章节」，压低开点成本。</td><td class="g-term">造物者节</td><td class="g-def">每年 1 月首战开幕日为运动诞生日：年度大促 + 限定款 + 限定徽章。</td></tr>
-              <tr><td class="g-term">sim-only</td><td class="g-def">主线只做仿真：真机门槛 ≈¥3500，一台笔记本即可完赛与学习。</td><td class="g-term">双城认证</td><td class="g-def">助教升主讲的考核：成都 + 杭州 两座首战城都认可才算数。</td></tr>
-            </tbody>
-          </table>
-        </div>
+      <div class="hero-cta rv">
+        <a class="btn btn-primary" href="#/test">做 33 题段位测试</a>
+        <a class="btn btn-ghost" href="#/growth">查看成长体系</a>
       </div>
     </div>
   </section>
@@ -359,10 +202,10 @@
     <div class="wrap">
       <div class="sec-head rv"><h2>第 001 只鸭，等你点亮。</h2><i class="sec-rule"></i></div>
       <div class="end-row">
-        <p>先花 4 分钟做段位测试，或直接报名三轨营——报名即发 Duck #0001 起实体徽章，编号永久保留。</p>
+        <p>先花 4 分钟做段位测试，或直接报名训练营——报名即发 Duck #0001 起实体徽章，编号永久保留。</p>
         <div class="hero-cta">
           <a class="btn btn-primary" href="#/test">开始段位测试</a>
-          <a class="btn btn-ghost" href="#/camp">报名三轨营</a>
+          <a class="btn btn-ghost" href="#/camp">报名训练营</a>
         </div>
       </div>
     </div>
@@ -373,19 +216,18 @@
     <div class="f-tag">WE DON'T HIRE THE WORLD · WE EQUIP IT</div>
     <div class="f-sitemap">
       <div class="sm-group">
-        <h4>商业结构 · 五章（首页总纲）</h4>
+        <h4>访客动线 · 首页</h4>
         <ul>
-          <li><a href="#ch1"><span class="sm-no">Ch.01</span>商业模式 · 三翼飞轮</a><span class="sm-sub">详见 P.06 作战图谱</span></li>
-          <li><a href="#ch2"><span class="sm-no">Ch.02</span>引流设计</a><span class="sm-sub">详见 P.07 开源内核</span></li>
-          <li><a href="#ch3"><span class="sm-no">Ch.03</span>合作渠道</a><span class="sm-sub">详见 P.03 合作与共赢</span></li>
-          <li><a href="#ch4"><span class="sm-no">Ch.04</span>教育设计</a><span class="sm-sub">详见 P.02 教育与营地</span></li>
-          <li><a href="#ch5"><span class="sm-no">Ch.05</span>营地结构</a><span class="sm-sub">详见 P.02 教育与营地</span></li>
+          <li><a href="#kids"><span class="sm-no">KIDS</span>给孩子 · 反屏幕与成长档案</a></li>
+          <li><a href="#you"><span class="sm-no">YOU</span>给自己 · 三轨训练营与学员 offer</a></li>
+          <li><a href="#together"><span class="sm-no">WITH</span>一起做 · 机构与开发者</a></li>
+          <li><a href="#ranks"><span class="sm-no">L1–L7</span>成长体系 · 七级段位预览</a></li>
         </ul>
       </div>
       <div class="sm-group">
         <h4>站点页面 · 八页</h4>
         <ul>
-          <li><a href="#/"><span class="sm-no">P.01</span>首页 · 商业结构总纲</a></li>
+          <li><a href="#/"><span class="sm-no">P.01</span>首页</a></li>
           <li><a href="#/camp"><span class="sm-no">P.02</span>教育与营地</a></li>
           <li><a href="#/vision"><span class="sm-no">P.03</span>合作与共赢</a></li>
           <li><a href="#/test"><span class="sm-no">P.04</span>段位测试</a></li>
@@ -400,7 +242,7 @@
         <ul>
           <li><a href="#/activities"><span class="sm-no">P.09</span>活动</a></li>
           <li><a href="#/admin"><span class="sm-no">P.10</span>管理指南</a></li>
-          <li><a href="#/vision"><span class="sm-no">P.03</span>十方交换 · 三条永不（已并入合作与共赢）</a></li>
+          <li><a href="#/vision"><span class="sm-no">档案</span>十方交换 · 三条永不（已并入合作与共赢）</a></li>
           <li><a href="#/vision/v-archive"><span class="sm-no">档案</span>筹备计划书 · 创始原文</a></li>
         </ul>
       </div>
