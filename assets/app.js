@@ -1,9 +1,13 @@
-/* MicroDuck 造物世界 · 前端应用 v5（hash 路由 SPA · 营销动线版式）
- * 路由：#/ 首页（v5 商业官网 · hero 鸭图 + 给孩子/给自己/一起做/段位预览，静态内容）、#/test 段位测试（33 题分支问卷 v1.1.0）、
- *       #/growth 成长体系、#/map 作战图谱、#/camp 教育与营地（卖货语气 + 四张 offer 卡 + 报名）、#/open 开源内核（热血微调）、
- *       #/activities 活动、#/library 内容库、#/library/:id 文章详情、#/vision 合作与共赢（文档感保留页 · 含三翼飞轮大图 + 锚点 #/vision/:id）、
- *       #/pledge 已并入 #/vision（路由别名保留）、#/admin 管理指南。
- * 版式：营销页（camp/growth/map/library/admin）章节头组件用 pageHeadPlain（无 Ch./P. 编号）；
+/* MicroDuck 造物世界 · 前端应用 v6（hash 路由 SPA · 正经公司官网版式）
+ * 路由：#/ 首页（v5 营销动线保留：hero 鸭图 + 给孩子/给自己/一起做/段位预览，仅段落头套三件套模板）、
+ *       #/test 段位测试（33 题分支问卷 v1.1.0）、#/growth 成长体系、#/map 作战图谱（主导航撤下，路由保留可直达）、
+ *       #/camp 课程体系（三轨营 + 四张 offer 卡 + 报名；#/camp/:anchor 锚点直达，如 #/camp/camp-form-head 报名）、
+ *       #/open 开源社区、#/news 新闻动态（v6 新：三里程碑新闻卡 + 全部/公告/复刻日志/工程白皮书/信任公告 tab，
+ *       复用 posts 表与 Api.listPosts，track 键不变；#/library 并入 #/news 作路由别名，#/news/:id 与 #/library/:id 均为文章详情）、
+ *       #/about 关于我们（v6 新：使命 / 发展布局 / 联系我们；#/about/:anchor 锚点，如 #/about/contact）、
+ *       #/vision 合作与共赢（文档感保留页 · 含三翼飞轮大图 + 锚点 #/vision/:id）、#/pledge 已并入 #/vision（路由别名保留）、
+ *       #/activities 活动、#/admin 管理指南。
+ * 版式：营销页（camp/growth/map/news/about/admin）页头组件统一 pageHeadPlain（无 Ch./P. 编号 · 黑体标题）；
  *       文档感只保留给合作页 #/vision（pageHead · P.03）。
  * 数据全部经 window.Api（assets/api.js）；题库 window.QUIZ（assets/quiz-data.js）；
  * FW_CONFIG.SUPABASE 的 url/anonKey 任一为空 = 演示模式。
@@ -21,15 +25,33 @@
   var appView = null;
   var mainEl = null;
   var lastKey = null;
-  var libTab = 'book';   // 内容库当前栏目（默认第一个：一人一鸭·连载）
+  var newsTab = 'all';   // 新闻动态当前栏目（v6：默认「全部」）
 
   var WEEK = ['周日', '周一', '周二', '周三', '周四', '周五', '周六'];
   var TYPE_COLORS = { '体验课': '#F2A93B', '仿真赛': '#24466B', 'Demo Day': '#C0392B', '造物者节': '#8A5A2B' };
+  /* v6：track 键不变（posts 表不动），仅栏目名改为新闻动态口径 */
   var COLS = [
-    { key: 'book', name: '一人一鸭·连载', color: '#F2A93B' },
-    { key: 'log', name: '复刻者日志', color: '#24466B' },
+    { key: 'book', name: '公告', color: '#F2A93B' },
+    { key: 'log', name: '复刻日志', color: '#24466B' },
     { key: 'eng', name: '工程白皮书', color: '#4A6785' },
     { key: 'pledge', name: '信任公告', color: '#C0392B' }
+  ];
+  var NEWS_TABS = [
+    { key: 'all', name: '全部' },
+    { key: 'book', name: '公告' },
+    { key: 'log', name: '复刻日志' },
+    { key: 'eng', name: '工程白皮书' },
+    { key: 'pledge', name: '信任公告' }
+  ];
+
+  /* v6 新闻动态 · 三条里程碑（静态新闻体，不进 posts 表；数字逐字取自 MATERIALS-BRIEF.md §12 工程事实） */
+  var MILESTONES = [
+    { tag: '行业里程碑', title: 'MicroDuck 官方首售 24 小时 $2.6M',
+      sum: 'Pollen Robotics（2025 年加入 Hugging Face）的 25cm 双足鸭 $399 预售，开售 24 小时约 6500 台——我们把它变成一门人人可上的课。' },
+    { tag: '工程里程碑', title: '本机复刻验证完成：149 项测试全过',
+      sum: '开源仓库 CPU 全链路跑通，部署契约 obs[1,61] → act[1,14] 校验通过——一台笔记本即可开课。' },
+    { tag: '实验突破', title: '自训实验突破：从 −0.20 到 +13.74',
+      sum: '学员任务「教会鸭子合上笔记本」256 并行环境 · 18.4 小时训练实录，回合长度 18 → 275，峰值 +16.11。' }
   ];
 
   /* ============ 工具 ============ */
@@ -171,8 +193,29 @@
     if (head === 'test') return { view: 'test' };
     if (head === 'growth') return { view: 'growth' };
     if (head === 'map') return { view: 'map' };
-    if (head === 'camp') return { view: 'camp' };
+    if (head === 'camp') {
+      var campAnchor = parts[1] || '';
+      if (campAnchor) {
+        try { campAnchor = decodeURIComponent(campAnchor); } catch (e) { /* 原样使用 */ }
+      }
+      return { view: 'camp', anchor: campAnchor };
+    }
     if (head === 'open') return { view: 'open' };
+    if (head === 'news') {
+      if (parts[1]) {
+        var nid = parts[1];
+        try { nid = decodeURIComponent(nid); } catch (e) { /* 原样使用 */ }
+        return { view: 'post', id: nid };
+      }
+      return { view: 'news' };
+    }
+    if (head === 'about') {
+      var aboutAnchor = parts[1] || '';
+      if (aboutAnchor) {
+        try { aboutAnchor = decodeURIComponent(aboutAnchor); } catch (e) { /* 原样使用 */ }
+      }
+      return { view: 'about', anchor: aboutAnchor };
+    }
     if (head === 'pledge') return { view: 'vision' };   /* v4：十方共赢并入合作与共赢，旧链接别名 */
     if (head === 'vision') {
       var anchor = parts[1] || '';
@@ -182,25 +225,29 @@
       return { view: 'vision', anchor: anchor };
     }
     if (head === 'activities') return { view: 'activities' };
-    if (head === 'library') {
+    if (head === 'library') {   /* v6：内容库并入新闻动态，#/library/:id 文章详情路由保留 */
       if (parts[1]) {
         var pid = parts[1];
         try { pid = decodeURIComponent(pid); } catch (e) { /* 原样使用 */ }
         return { view: 'post', id: pid };
       }
-      return { view: 'library' };
+      return { view: 'news' };
     }
     if (head === 'admin') return { view: 'admin' };
     if (head === '') return { view: 'home' };
     return { view: '404' };
   }
 
-  function routeKey(r) { return r ? r.view + (r.id ? ':' + r.id : '') : ''; }
+  function routeKey(r) {
+    if (!r) return '';
+    return r.view + (r.id ? ':' + r.id : '') + (r.anchor ? '@' + r.anchor : '');
+  }
 
   function setNavActive(view) {
     var map = {
       home: '#/', test: '#/test', growth: '#/growth', map: '#/map',
-      camp: '#/camp', library: '#/library', post: '#/library', vision: '#/vision'
+      camp: '#/camp', news: '#/news', post: '#/news', about: '#/about',
+      open: '#/open', vision: '#/vision'
     };
     var target = map[view] || '';
     var links = document.querySelectorAll('.nav-links a');
@@ -226,12 +273,13 @@
     if (r.view === 'test') { setNavActive('test'); viewTest(); }
     else if (r.view === 'growth') { setNavActive('growth'); viewGrowth(); }
     else if (r.view === 'map') { setNavActive('map'); viewMap(); }
-    else if (r.view === 'camp') { setNavActive('camp'); viewCamp(); }
-    else if (r.view === 'open') { setNavActive(''); viewOpen(); }
+    else if (r.view === 'camp') { setNavActive('camp'); viewCamp(r.anchor); }
+    else if (r.view === 'open') { setNavActive('open'); viewOpen(); }
+    else if (r.view === 'news') { setNavActive('news'); viewNews(); }
+    else if (r.view === 'about') { setNavActive('about'); viewAbout(r.anchor); }
     else if (r.view === 'vision') { setNavActive('vision'); viewVision(r.anchor); }
     else if (r.view === 'activities') { setNavActive(''); viewActivities(); }
-    else if (r.view === 'library') { setNavActive('library'); viewLibrary(); }
-    else if (r.view === 'post') { setNavActive('post'); viewPost(r.id); }
+    else if (r.view === 'post') { setNavActive('news'); viewPost(r.id); }
     else if (r.view === 'admin') { setNavActive(''); viewAdmin(); }
     else { setNavActive(''); view404(); }
   }
@@ -830,19 +878,19 @@
         pageHeadPlain('成长体系',
           '七级段位，每级一段能讲出来的故事。段位永久有效；赛季排行榜每半年重置；个人和组织共用一条经验槽——帮别人升级就是给自己升级。') +
         '<div class="tune-note">EXP 数值待实测调参（方案注明，以书稿版为基准）</div>' +
-        '<h3 class="list-title">七级段位</h3>' +
+        '<h3 class="list-title plain">七级段位</h3>' +
         '<div class="rank-list"><div class="card table-card"><div class="table-wrap"><table class="data-table rank-table">' +
           '<thead><tr><th>级</th><th>段位名</th><th>判据</th><th>EXP</th></tr></thead>' +
           '<tbody>' + rankRows + '</tbody></table></div></div></div>' +
         '<div class="dim-line"></div>' +
-        '<h3 class="list-title">五幕关卡</h3>' +
+        '<h3 class="list-title plain">五幕关卡</h3>' +
         '<div class="acts-row">' + stageCards + '</div>' +
         '<div class="dim-line"></div>' +
-        '<h3 class="list-title">成就墙</h3>' +
+        '<h3 class="list-title plain">成就墙</h3>' +
         '<p class="desc" style="margin-bottom:14px">成就分普通 / 稀有 / 史诗 / 传说四档，随成长阶段更新。</p>' +
         '<div class="badge-wall">' + badgeCards + '</div>' +
         '<div class="dim-line"></div>' +
-        '<h3 class="list-title">一条经验槽</h3>' +
+        '<h3 class="list-title plain">一条经验槽</h3>' +
         '<p class="desc" style="margin-bottom:14px">学员 → 助教（约 20% 转化）→ 主讲（双城认证）→ 城市合伙人。个人升级与组织升级走同一条槽。</p>' +
         '<div class="slot-flow">' + slotNodes + '</div>' +
       '</div></section>';
@@ -944,19 +992,19 @@
       '<section class="page"><div class="wrap">' +
         pageHeadPlain('作战图谱',
           '扩张不是勇气问题，是数据批准问题。先看台账，再看地图——光是数据点亮的，铺之前，先验电压。') +
-        '<h3 class="list-title">运动路线图</h3>' +
+        '<h3 class="list-title plain">运动路线图</h3>' +
         '<div class="timeline"><div class="card table-card"><div class="table-wrap"><table class="data-table road-table">' +
           '<thead><tr><th>时间</th><th>里程碑</th><th>说明</th></tr></thead>' +
           '<tbody>' + tl + '</tbody></table></div></div></div>' +
         '<div class="phase-motto" style="margin-top:12px">' + mottoHtml + '</div>' +
         '<div class="dim-line"></div>' +
-        '<h3 class="list-title">城市网络</h3>' +
+        '<h3 class="list-title plain">城市网络</h3>' +
         '<div class="card table-card"><div class="table-wrap"><table class="data-table city-table">' +
           '<thead><tr><th>阶段</th><th>枢纽</th><th>窗口</th></tr></thead>' +
           '<tbody>' + cityRows + '</tbody></table></div></div>' +
         '<p class="city-note">北京备注：v2 分区中北京归天津群承接（合规与成本最高）；若在北京开，预算×1.5、审批周期另加 1–2 个月。</p>' +
         '<div class="dim-line"></div>' +
-        '<h3 class="list-title">社会化自动力飞轮</h3>' +
+        '<h3 class="list-title plain">社会化自动力飞轮</h3>' +
         '<p class="desc" style="margin-bottom:6px">燃料是荣誉，不是工资。六环首尾咬合：</p>' +
         '<div class="flywheel">' +
           '<div class="fw-ring" aria-hidden="true"></div>' +
@@ -964,7 +1012,7 @@
           '<div class="fw-center">社会化<br>自动力</div>' +
         '</div>' +
         '<div class="dim-line"></div>' +
-        '<h3 class="list-title">三翼飞轮</h3>' +
+        '<h3 class="list-title plain">三翼飞轮</h3>' +
         '<p class="desc" style="margin-bottom:10px">三翼各按各的燃料转：家长翼靠信任、校园翼靠资产、社会结构翼靠交换。只讲机制，不讲内部数值。</p>' +
         '<div class="grid grid-3">' + wingCards + '</div>' +
         '<div class="phase-motto wing-order"><b>[顺序纪律]</b> 第一棒 校园翼（2026 Q4–2027 Q1）→ 第二棒 家长翼（2027 寒假首战）→ 第三棒 社会结构翼（2027 起）——「先有信任的骨架，再长规模的肉」。</div>' +
@@ -976,7 +1024,7 @@
         '</div>' +
         '<p class="dim-label">四道闸口 · 过闸才准扩城，一道不过全军待命</p>' +
         '<div class="dim-line"></div>' +
-        '<h3 class="list-title">全国分区作战地图</h3>' +
+        '<h3 class="list-title plain">全国分区作战地图</h3>' +
         '<p class="desc">五大分区 · 首战 成都+杭州 · P1 广州+天津 · P2 西安+太原 · 暂缓 青岛。交通层与飞行轨迹为规划示意，非精确线路。</p>' +
         '<p class="map-embed-note">交互地图 · 可切图层 · 悬浮看分区 · 「倾斜视角」一秒立体感（纯 CSS，全设备可看）</p>' +
         '<div class="map-embed"><iframe id="map3d-frame" src="assets/map3d.html" title="全国分区作战地图"></iframe></div>' +
@@ -1079,7 +1127,7 @@
     '</article>';
   }
 
-  function viewCamp() {
+  function viewCamp(anchor) {
     var trackCards = '';
     for (var t = 0; t < CAMP_TRACKS.length; t++) {
       var tr = CAMP_TRACKS[t];
@@ -1147,7 +1195,7 @@
 
     appView.innerHTML =
       '<section class="page"><div class="wrap">' +
-        pageHeadPlain('教育与营地',
+        pageHeadPlain('课程体系',
           '五天，亲手做成一件难事——三条轨道、四类营地、一张明码标价的课表，总有一条路适合你（的孩子）。', tocCamp) +
 
         '<h3 class="list-title plain" id="camp-41">四条路，从兴趣到职业</h3>' +
@@ -1297,6 +1345,12 @@
         '</form>' +
       '</div></section>';
 
+    /* #/camp/:anchor —— 章内锚点落点（顶部「报名训练营」按钮直达报名表 #camp-form-head） */
+    if (anchor) {
+      var campEl = document.getElementById(anchor);
+      if (campEl) campEl.scrollIntoView();
+    }
+
     var form = document.getElementById('camp-form');
     bindLiveClear(form);
     form.addEventListener('submit', function (e) {
@@ -1337,17 +1391,17 @@
   function viewOpen() {
     var tocOpen =
       '<span class="toc-cap">本页目录</span>' +
-      '<a href="#open-21">§2.1 双仓与月度发版</a>' +
-      '<a href="#open-22">§2.2 贡献四步闭环</a>' +
-      '<a href="#open-23">§2.3 声望闭环</a>' +
-      '<a href="#open-24">§2.4 三级徽章</a>' +
-      '<a href="#open-25">§2.5 数据飞轮闭环</a>' +
-      '<a href="#open-26">§2.6 开源态度宣言</a>';
+      '<a href="#open-21">双仓与月度发版</a>' +
+      '<a href="#open-22">贡献四步闭环</a>' +
+      '<a href="#open-23">声望闭环</a>' +
+      '<a href="#open-24">三级徽章</a>' +
+      '<a href="#open-25">数据飞轮闭环</a>' +
+      '<a href="#open-26">开源态度宣言</a>';
     appView.innerHTML =
       '<section class="page"><div class="wrap">' +
-        pageHead('P.07', '开源内核',
+        pageHeadPlain('开源社区',
           '社区即课程，贡献即成长。图纸 / 代码 / 课程 / 账本全开源，clone 即拿走整套造物能力——你的第一个 PR，就是具身智能的行业入场券。fork 不是拥有，clone 下来改完第一行，才算开始。', tocOpen) +
-        '<h3 class="list-title xn" id="open-21"><span class="lt-no">§2.1</span>双仓与月度发版</h3>' +
+        '<h3 class="list-title plain" id="open-21">双仓与月度发版</h3>' +
         '<div class="grid grid-2">' +
           '<div class="card repo-card">' +
             '<div class="rc-name">GitHub · 全球主仓</div>' +
@@ -1359,7 +1413,7 @@
           '</div>' +
         '</div>' +
         '<div class="dim-line"></div>' +
-        '<h3 class="list-title xn" id="open-22"><span class="lt-no">§2.2</span>贡献四步闭环 · 每一步都算数</h3>' +
+        '<h3 class="list-title plain" id="open-22">贡献四步闭环 · 每一步都算数</h3>' +
         '<p class="sec-desc" style="margin-bottom:6px">在这里，没有人看你背景，只看你提交了什么——四步，从旁观者变成被署名的人。</p>' +
         '<div class="loop-steps">' +
           '<div class="loop-step"><div class="loop-no">1</div><div><h3>认领 good-first-issue</h3><p>从文档翻译、测试补全到任务魔改，总有一张牌桌缺人。</p></div></div>' +
@@ -1368,7 +1422,7 @@
           '<div class="loop-step"><div class="loop-no">4</div><div><h3>月度发版 · changelog 署名</h3><p>你的 GitHub ID 进入发版记录——简历可以修饰，提交历史不会。</p></div></div>' +
         '</div>' +
         '<div class="dim-line"></div>' +
-        '<h3 class="list-title xn" id="open-23"><span class="lt-no">§2.3</span>声望闭环</h3>' +
+        '<h3 class="list-title plain" id="open-23">声望闭环</h3>' +
         '<div class="slot-flow">' +
           '<div class="slot-node"><h3>公开记录</h3><p>个人主页公开记录每一次贡献</p></div>' +
           '<div class="slot-node"><h3>Committer</h3><p>3 次优质合入晋升 Committer</p></div>' +
@@ -1376,20 +1430,20 @@
           '<div class="slot-node"><h3>反哺新人</h3><p>评审与带教，社区自生长</p></div>' +
         '</div>' +
         '<div class="dim-line"></div>' +
-        '<h3 class="list-title xn" id="open-24"><span class="lt-no">§2.4</span>三级徽章</h3>' +
+        '<h3 class="list-title plain" id="open-24">三级徽章</h3>' +
         '<div class="rank-strip">' +
           '<span class="rank-chip"><b>I</b>复刻者 · 参与</span><span class="rank-arrow">→</span>' +
           '<span class="rank-chip"><b>II</b>魔改师 · 魔改创意</span><span class="rank-arrow">→</span>' +
           '<span class="rank-chip"><b>III</b>原创者 · 孵化作品</span>' +
         '</div>' +
         '<div class="dim-line"></div>' +
-        '<h3 class="list-title xn" id="open-25"><span class="lt-no">§2.5</span>数据飞轮闭环</h3>' +
+        '<h3 class="list-title plain" id="open-25">数据飞轮闭环</h3>' +
         '<p class="sec-desc" style="margin-bottom:2px">贡献 → 作品 → 数据 → 课程迭代 → 新贡献者——闭环之外还有持续性构建：课程包公开版本号迭代，贡献者进 changelog，数据反哺课程，课程反哺社区。</p>' +
         '<div class="loop-ring">' +
           '<span class="lr-tag">闭环</span><span class="wc-chip">贡献</span><span class="wc-arrow">→</span><span class="wc-chip">作品</span><span class="wc-arrow">→</span><span class="wc-chip">数据</span><span class="wc-arrow">→</span><span class="wc-chip">课程迭代</span><span class="wc-arrow">→</span><span class="wc-chip">新贡献者</span><span class="wc-arrow lr-back">↺ 回到贡献</span>' +
         '</div>' +
         '<div class="dim-line"></div>' +
-        '<h3 class="list-title xn" id="open-26"><span class="lt-no">§2.6</span>开源态度宣言</h3>' +
+        '<h3 class="list-title plain" id="open-26">开源态度宣言</h3>' +
         '<div class="quote-block">' +
           '<p class="qb-text">「不惧被模仿。模仿成功了，是替我们做宣传；模仿受挫了，说明存在能力缺口——欢迎来我们这里补齐。」</p>' +
           '<div class="qb-src">—— MicroDuck 开源态度宣言</div>' +
@@ -1643,7 +1697,7 @@
   function viewActivities() {
     appView.innerHTML =
       '<section class="page"><div class="wrap">' +
-        pageHead('P.09', '活动',
+        pageHeadPlain('公开课与活动',
           '体验课与赛事都有线上环节，错过有纪要。点「报名」留下联系方式，开场链接在群里发。') +
         rhythmStrip() +
         '<div id="act-list"><p class="empty">正在加载…</p></div>' +
@@ -1718,14 +1772,16 @@
   }
 
   /* ============================================================
-   * 视图：#/library 内容库（book / log / eng / pledge 四栏目）
+   * 视图：#/news 新闻动态（v6 新 · 原「内容库」并入）
+   * 置顶三条里程碑新闻卡（静态）+ 栏目 tab（全部/公告/复刻日志/工程白皮书/信任公告，
+   * track 键 book/log/eng/pledge 不变）+ posts 文章卡列表；#/library 为本页路由别名。
    * ============================================================ */
 
-  function libraryTabs() {
-    var h = '<div class="tabs" id="lib-tabs">';
-    for (var i = 0; i < COLS.length; i++) {
-      var t = COLS[i];
-      h += '<button type="button" class="tab' + (t.key === libTab ? ' active' : '') + '" data-track="' + t.key + '">' + t.name + '</button>';
+  function newsTabs() {
+    var h = '<div class="tabs" id="news-tabs">';
+    for (var i = 0; i < NEWS_TABS.length; i++) {
+      var t = NEWS_TABS[i];
+      h += '<button type="button" class="tab' + (t.key === newsTab ? ' active' : '') + '" data-track="' + t.key + '">' + t.name + '</button>';
     }
     return h + '</div>';
   }
@@ -1733,7 +1789,7 @@
   function postCard(p) {
     var t = colOf(p.track);
     return (
-      '<a class="card post-card" href="#/library/' + encodeURIComponent(p.id) + '">' +
+      '<a class="card post-card" href="#/news/' + encodeURIComponent(p.id) + '">' +
         '<div class="post-head"><i class="dot" style="background:' + t.color + '" aria-hidden="true"></i><span>' + esc(t.name) + '</span></div>' +
         '<div class="post-title">' + esc(p.title || '') + '</div>' +
         '<div class="post-meta">' + esc(p.author || '') + ' · ' + esc(String(p.date || '').slice(0, 10)) + '</div>' +
@@ -1742,57 +1798,146 @@
     );
   }
 
-  function paintLibList(all) {
-    var host = document.getElementById('lib-list');
+  function paintNewsList(all) {
+    var host = document.getElementById('news-list-host');
     if (!host) return;
     var src = all || [];
     var h = '';
     var n = 0;
     for (var i = 0; i < src.length; i++) {
-      if (src[i].track === libTab) { h += postCard(src[i]); n++; }
+      if (newsTab === 'all' || src[i].track === newsTab) { h += postCard(src[i]); n++; }
     }
     if (!n) h = '<p class="empty">这个栏目还没有内容，稍后再来看看。</p>';
     host.innerHTML = h;
   }
 
-  function viewLibrary() {
+  function viewNews() {
+    var msHtml = '';
+    for (var m = 0; m < MILESTONES.length; m++) {
+      var ms = MILESTONES[m];
+      msHtml += '<article class="card ms-card">' +
+        '<span class="ms-tag">' + esc(ms.tag) + '</span>' +
+        '<h3 class="ms-title">' + esc(ms.title) + '</h3>' +
+        '<p class="ms-sum">' + esc(ms.sum) + '</p>' +
+      '</article>';
+    }
+
     appView.innerHTML =
       '<section class="page"><div class="wrap">' +
-        pageHeadPlain('内容库',
-          '连载、日志、白皮书与信任公告，按栏目归档，点开即读。') +
-        '<div class="ops-banner">' +
-          '<span class="ob-tag">活动预告</span>' +
-          '<span class="ob-txt">双城首战 · 仿真赛 No.1（2027 寒 · 成都 + 杭州）——一台笔记本即可参赛，现已开放报名意向。</span>' +
-          '<a href="#/activities">去报名 →</a>' +
-        '</div>' +
-        libraryTabs() +
-        '<div id="lib-list"><p class="empty">正在加载…</p></div>' +
+        pageHeadPlain('新闻动态',
+          '里程碑、公告与工程实录——MicroDuck 的每一步，都留下可验证的证据。') +
+        '<div class="ms-grid" id="ms-grid">' + msHtml + '</div>' +
+        '<div class="dim-line"></div>' +
+        newsTabs() +
+        '<div id="news-list-host"><p class="empty">正在加载…</p></div>' +
       '</div></section>';
 
     var currentPosts = null;
-    document.getElementById('lib-tabs').addEventListener('click', function (e) {
+    document.getElementById('news-tabs').addEventListener('click', function (e) {
       var btn = e.target.closest ? e.target.closest('[data-track]') : null;
       if (!btn) return;
-      libTab = btn.getAttribute('data-track');
-      var all = document.querySelectorAll('#lib-tabs .tab');
+      newsTab = btn.getAttribute('data-track');
+      var all = document.querySelectorAll('#news-tabs .tab');
       for (var i = 0; i < all.length; i++) {
         if (all[i] === btn) all[i].classList.add('active');
         else all[i].classList.remove('active');
       }
-      paintLibList(currentPosts);
+      paintNewsList(currentPosts);
     });
 
     Api.listPosts().then(function (list) {
-      if (routeKey(parseRoute()) !== 'library') return;
+      if (routeKey(parseRoute()) !== 'news') return;
       currentPosts = list || [];
-      paintLibList(currentPosts);
+      paintNewsList(currentPosts);
     }).catch(function () {
-      var host = document.getElementById('lib-list');
+      var host = document.getElementById('news-list-host');
       if (host) host.innerHTML = '<p class="empty">内容加载失败，请刷新重试。</p>';
     });
   }
 
-  /* ---------- #/library/:id 文章详情 ---------- */
+  /* ============================================================
+   * 视图：#/about 关于我们（v6 新）
+   * 使命（反屏幕运动 + 装备世界 + 筹备计划书定位）/ 发展布局（路线图紧凑表 + 城市网络 +
+   * 作战地图入口，原「作战图谱」主导航内容挂靠于此）/ 联系我们（微信/邮箱/城市三卡）；
+   * 三条永不与教育宣言各一行链到 #/vision。#/about/:anchor 锚点直达。
+   * ============================================================ */
+
+  function viewAbout(anchor) {
+    var tl = '';
+    for (var i = 0; i < ROADMAP.length; i++) {
+      tl += '<tr class="tl-node">' +
+        '<td class="tl-when">' + esc(ROADMAP[i][0]) + '</td>' +
+        '<td class="tl-mile"><b>' + esc(ROADMAP[i][1]) + '</b></td>' +
+        '<td>' + esc(ROADMAP[i][2]) + '</td></tr>';
+    }
+    var cityCards = '';
+    for (var c = 0; c < CITIES.length; c++) {
+      var city = CITIES[c];
+      cityCards += '<div class="city-card">' +
+        '<span class="c-phase' + (city[3] ? ' hold' : '') + '">' + esc(city[0]) + '</span>' +
+        '<b>' + esc(city[1]) + '</b>' +
+        '<span class="cc-window">' + esc(city[2]) + '</span>' +
+      '</div>';
+    }
+
+    appView.innerHTML =
+      '<section class="page"><div class="wrap">' +
+        pageHeadPlain('关于我们',
+          '一人一鸭，人人都是造物者——MicroDuck 造物世界的使命、发展布局与联系方式。') +
+
+        '<h3 class="list-title plain" id="about-mission">我们的使命</h3>' +
+        '<div class="card about-mission">' +
+          '<p class="am-screen">「把孩子的手，从屏幕里抢回来。」——这是一场反屏幕运动：屏幕给答案，双手给本事。</p>' +
+          '<p class="am-equip">我们不雇佣世界，我们<span class="hl">装备世界</span></p>' +
+          '<p class="am-locate">以具身智能前沿为切入点，构建产学研真正结合的世界一流产研中心——<a href="#/vision/v-archive">筹备计划书 · 创始原文 →</a></p>' +
+        '</div>' +
+        '<div class="dim-line"></div>' +
+
+        '<h3 class="list-title plain" id="about-layout">发展布局</h3>' +
+        '<p class="sec-desc" style="margin-bottom:8px">扩张不是勇气问题，是数据批准问题：先看台账，再看地图——光是数据点亮的。</p>' +
+        '<div class="card table-card"><div class="table-wrap"><table class="data-table road-table">' +
+          '<thead><tr><th>时间</th><th>里程碑</th><th>说明</th></tr></thead>' +
+          '<tbody>' + tl + '</tbody></table></div></div>' +
+        '<h4 class="sub-title" style="margin-top:14px">城市网络</h4>' +
+        '<div class="city-grid">' + cityCards + '</div>' +
+        '<p class="about-maplink"><a href="#/map">查看全国分区作战地图 →</a></p>' +
+        '<div class="dim-line"></div>' +
+
+        '<h3 class="list-title plain" id="about-contact">联系我们</h3>' +
+        '<div class="contact-grid">' +
+          '<div class="card ct-card">' +
+            '<span class="ct-k">微信</span>' +
+            '<div class="qr-slot"><span>官方群二维码<br>即将上线</span></div>' +
+          '</div>' +
+          '<div class="card ct-card">' +
+            '<span class="ct-k">邮箱</span>' +
+            '<div class="ct-val">hello@microduck.cn</div>' +
+            '<span class="ct-note">占位 · 开通中</span>' +
+          '</div>' +
+          '<div class="card ct-card">' +
+            '<span class="ct-k">城市</span>' +
+            '<div class="ct-val">成都 · 杭州</div>' +
+            '<span class="ct-note">首战筹备中</span>' +
+          '</div>' +
+        '</div>' +
+        '<div class="about-trust">' +
+          '<div class="at-row"><b>三条永不</b>永不挪用预收款 · 永不让渡课程与认证主权 · 永不取消公益名额——<a href="#/vision/vision-34">详见合作与共赢章程 →</a></div>' +
+          '<div class="at-row"><b>教育宣言</b>证据先于自信 · 身份先于坚持 · 同伴先于老师——<a href="#/vision/vision-35">详见教育宣言 →</a></div>' +
+        '</div>' +
+        '<div class="btn-row">' +
+          '<a class="btn btn-primary" href="#/camp/camp-form-head">报名训练营</a>' +
+          '<a class="btn btn-ghost" href="#/news">查看新闻动态</a>' +
+        '</div>' +
+      '</div></section>';
+
+    /* #/about/:anchor —— 章内锚点落点（页脚「联系我们」直达 #/about/contact → 元素 #about-contact） */
+    if (anchor) {
+      var el = document.getElementById(anchor) || document.getElementById('about-' + anchor);
+      if (el) el.scrollIntoView();
+    }
+  }
+
+  /* ---------- #/news/:id（及兼容 #/library/:id）文章详情 ---------- */
 
   /* 正文渲染：空行分段；「- 」开头的连续行渲染为列表；段内换行转 <br> */
   function renderArticleBody(body) {
@@ -1831,7 +1976,7 @@
   function viewPost(id) {
     appView.innerHTML =
       '<section class="page"><div class="wrap">' +
-        '<a class="back-link" href="#/library">← 返回内容库</a>' +
+        '<a class="back-link" href="#/news">← 返回新闻动态</a>' +
         '<div id="post-body"><p class="empty">正在加载…</p></div>' +
       '</div></section>';
     Api.getPost(id).then(function (p) {
@@ -1871,8 +2016,8 @@
       '新增场次：starts_at 开场时间、slot 场次类型（体验课 / 仿真赛 / Demo Day / 造物者节）、title 主题、host 主理、descr 简介、capacity 名额。'],
     ['rsvps', '报名记录',
       '每场活动的报名名单（昵称 + 微信号），同一微信号同一场只记一次；删活动连带删报名。匿名端无任何直读权限。'],
-    ['posts', '内容库',
-      'track 栏目取值：book 一人一鸭·连载 / log 复刻者日志 / eng 工程白皮书 / pledge 信任公告。title 唯一；正文空行分段，以「- 」开头的行渲染为列表。']
+    ['posts', '新闻动态',
+      'track 栏目取值不变：book 公告 / log 复刻日志 / eng 工程白皮书 / pledge 信任公告（v6 栏目名口径）。title 唯一；正文空行分段，以「- 」开头的行渲染为列表。']
   ];
 
   function viewAdmin() {
@@ -1904,7 +2049,7 @@
             '保存即刻生效，前台刷新即可看到。防重复报名与名额校验由数据库自动完成，无需人工核对。</p>' +
           '</div>' +
         '</div>' +
-        '<h3 class="list-title">表 · 功能对照</h3>' +
+        '<h3 class="list-title plain">表 · 功能对照</h3>' +
         '<div class="card table-card"><div class="table-wrap">' +
           '<table class="admin data-table">' +
             '<thead><tr><th>表</th><th>管什么</th><th>说明</th></tr></thead>' +
