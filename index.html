@@ -40,180 +40,162 @@
 </header>
 
 <main>
-  <!-- 1. Hero -->
+  <!-- 0. 报头（一行式文档头 · 双细线） -->
+  <div class="masthead">
+    <div class="masthead-inner">
+      <div class="masthead-title"><img src="assets/avatar.png" alt="">MicroDuck 造物世界 · 运动简报</div>
+      <div class="masthead-meta">FOUNDING MEMO · v1.3 · 2026-11</div>
+    </div>
+  </div>
+
+  <!-- 1. 紧凑 Hero + 双栏密集区（桌面 7:5） -->
   <section id="top" class="hero">
     <div class="wrap">
-      <div class="hero-grid">
-        <div>
+      <div class="hero-line">
+        <h1>一人一鸭，人人都是<span class="hl">造物者</span></h1>
+        <div class="hero-side">
           <div class="badge rv"><span class="pulse-dot"></span>2027 寒 · 双城首战（成都 + 杭州）· 报名意向征集中</div>
-          <h1 class="rv">一人一鸭，<br>人人都是<span class="hl">造物者</span></h1>
-          <p class="lead rv">把一台开源机械鸭的完整复刻权交给每一个人。我们不承诺爱上机器人，只承诺你亲手做成过一件难事。</p>
-          <p class="lead-slogan rv">亲手复刻一只会走的机械鸭，把「我能行」变成可验证的证据。</p>
           <div class="hero-cta rv">
             <a class="btn btn-primary" href="#/test">做 33 题段位测试</a>
             <a class="btn btn-ghost" href="#/camp">报名三轨营</a>
           </div>
         </div>
-        <div class="rv">
-          <figure class="blueprint-card">
-            <img src="assets/avatar.png" alt="MicroDuck 蓝图头像：靛墨蓝坐标纸底 + 雏鸭黄鸭形 + 工程标注">
-            <figcaption class="bp-cap">H 250 MM · ZERO TO ONE · 造物世界</figcaption>
-          </figure>
+      </div>
+      <div class="brief-grid" id="chain">
+        <div class="brief-left">
+          <div class="kicker">BRIEFING · 定位 × 使命 × 证据链</div>
+          <p class="lead">把一台开源机械鸭的完整复刻权交给每一个人。我们不承诺爱上机器人，只承诺你亲手做成过一件难事。</p>
+          <p class="lead-slogan">亲手复刻一只会走的机械鸭，把「我能行」变成可验证的证据。</p>
+          <p class="mission-mini"><b>反屏幕运动 · </b>把孩子的手从屏幕里抢回来，放到真实世界里。我们不雇佣世界，我们装备世界。媒体免费报道的使命叙事，也是家长最深的共鸣——屏幕给答案，双手给本事。<a class="mission-link" href="#/vision">读一读这份筹备计划书 →</a></p>
+          <div class="chain-bar">
+            <div class="chain-cell" title="BOM 清单与到货验收单：15 颗舵机逐个空转测试"><span class="cc-no">01</span><b>采购</b></div>
+            <div class="chain-cell" title="装配标定记录 + 首只鸭点亮仪式（装鸭 +100 EXP）"><span class="cc-no">02</span><b>3D 打印装配</b></div>
+            <div class="chain-cell" title="你自己的训练曲线：从 −0.20 乱蹬到 +13.74 会走"><span class="cc-no">03</span><b>仿真 RL</b></div>
+            <div class="chain-cell" title="部署契约校验：obs[1,61] → act[1,14] 通过"><span class="cc-no">04</span><b>ONNX 部署</b></div>
+            <div class="chain-cell" title="15 秒鸭子走路视频：作业即广告，产物即传播物"><span class="cc-no">05</span><b>真机行走</b></div>
+          </div>
+          <div class="chain-evi">BOM 清单与到货验收单：15 颗舵机逐个空转测试 · 装配标定记录 + 首只鸭点亮仪式（装鸭 +100 EXP） · 你自己的训练曲线：−0.20 乱蹬 → +13.74 会走 · 部署契约校验 obs[1,61] → act[1,14] 通过 · 15 秒鸭子走路视频：作业即广告，产物即传播物</div>
+          <div class="chain-cap">FIVE-STATION EVIDENCE CHAIN · H 250 MM · ZERO TO ONE · 造物世界</div>
         </div>
+        <aside class="brief-right">
+          <div class="table-wrap">
+            <table class="data-table stat-table">
+              <thead><tr><th colspan="2">DATA ANCHORS · 数据速览</th></tr></thead>
+              <tbody>
+                <tr><td>官方首售</td><td class="num t-num">$2.6M · ≈6500 台 / 24h</td></tr>
+                <tr><td>真机门槛</td><td class="num t-num">≈¥3500 → 主线 sim-only</td></tr>
+                <tr><td>本机复刻验证</td><td class="num t-num">149 项全过</td></tr>
+                <tr><td>开源测试</td><td class="num t-num">942 项 · 19 Rust crate · 9 ONNX 策略</td></tr>
+                <tr><td>自训实录</td><td class="num t-num">−0.20 → +13.74（峰值 +16.11）</td></tr>
+                <tr><td>复刻成本</td><td class="num t-num">≈¥4040 vs 官方 ≈¥3500</td></tr>
+                <tr><td>万台自研</td><td class="num t-num">可压 ¥1600–2400</td></tr>
+                <tr><td>许可</td><td class="num t-num">软件 Apache-2.0 · 结构 CC BY-SA-NC</td></tr>
+                <tr><td>双城首战</td><td class="num t-num">成都 + 杭州 · 2027 寒</td></tr>
+                <tr><td>路线</td><td class="num t-num">2026 Q4 内核贯通 → 2028+ 20+ 城</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p class="stat-note">故事标【演绎】，数字没标——以上全部出自工程实测与公开记录。</p>
+        </aside>
       </div>
     </div>
   </section>
 
-  <!-- 2. 反屏幕运动使命条 -->
-  <section class="mission">
-    <div class="wrap">
-      <div class="m-kicker">MISSION · 反屏幕运动</div>
-      <h2>把孩子的手从屏幕里抢回来，<br>放到真实世界里。</h2>
-      <p>我们不雇佣世界，我们装备世界。媒体免费报道的使命叙事，也是家长最深的共鸣——屏幕给答案，双手给本事。<a class="mission-link" href="#/vision">读一读这份筹备计划书 →</a></p>
-    </div>
-  </section>
-
-  <!-- 3. 五站证据链 -->
-  <section id="chain" class="sec">
-    <div class="wrap">
-      <div class="sec-head rv">
-        <div class="kicker">EVIDENCE CHAIN</div>
-        <h2>五站证据链</h2>
-        <p class="desc">从零件盒到真机行走，每一站都留下可验收的证据——「我能行」不是口号，是证据链。</p>
-      </div>
-      <div class="chain" data-stagger>
-        <div class="chain-step rv">
-          <div class="chain-no">01</div>
-          <div class="chain-main">
-            <h3>采购</h3>
-            <div class="evi">BOM 清单与到货验收单：15 颗舵机逐个空转测试</div>
-          </div>
-        </div>
-        <div class="chain-step rv">
-          <div class="chain-no">02</div>
-          <div class="chain-main">
-            <h3>3D 打印装配</h3>
-            <div class="evi">装配标定记录 + 首只鸭点亮仪式（装鸭 +100 EXP）</div>
-          </div>
-        </div>
-        <div class="chain-step rv">
-          <div class="chain-no">03</div>
-          <div class="chain-main">
-            <h3>仿真 RL</h3>
-            <div class="evi">你自己的训练曲线：从 −0.20 乱蹬到 +13.74 会走</div>
-          </div>
-        </div>
-        <div class="chain-step rv">
-          <div class="chain-no">04</div>
-          <div class="chain-main">
-            <h3>ONNX 部署</h3>
-            <div class="evi">部署契约校验：obs[1,61] → act[1,14] 通过</div>
-          </div>
-        </div>
-        <div class="chain-step rv">
-          <div class="chain-no">05</div>
-          <div class="chain-main">
-            <h3>真机行走</h3>
-            <div class="evi">15 秒鸭子走路视频：作业即广告，产物即传播物</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- 4. 三轨卡片 -->
+  <!-- 2. 三轨对比表 -->
   <section id="tracks" class="sec">
     <div class="wrap">
-      <div class="sec-head rv">
-        <div class="kicker">THREE TRACKS</div>
-        <h2>三轨营</h2>
-        <p class="desc">兴趣点火、工程成型、落地上路——三条轨道，同一个终点：亲手做成一件难事。</p>
+      <div class="sec-head rv"><span class="sec-no">§1</span><h2>三轨营</h2><i class="sec-rule"></i></div>
+      <p class="sec-desc">兴趣点火、工程成型、落地上路——三条轨道，同一个终点：亲手做成一件难事。</p>
+      <div class="table-wrap">
+        <table class="data-table track-table">
+          <thead><tr><th>轨</th><th>人群</th><th>时长</th><th>副口号</th><th>出口通道</th></tr></thead>
+          <tbody>
+            <tr>
+              <td class="tt-rail"><b>TRACK A</b> · 兴趣</td>
+              <td>初三 – 高一</td>
+              <td>5 天日营</td>
+              <td><span class="tt-slogan">「亲手造出你的第一只 AI 机器人」</span><span class="tt-sum">从零件盒到会走的鸭子，五天完成人生第一次完整复刻，点亮自己的鸭。</span></td>
+              <td class="tt-exit">→ 助教池（每期约 20%）</td>
+            </tr>
+            <tr>
+              <td class="tt-rail"><b>TRACK B</b> · 工程</td>
+              <td>高二 – 大一</td>
+              <td>6 天</td>
+              <td><span class="tt-slogan">「从复刻到创造，只差一个寒假」</span><span class="tt-sum">复刻之上加魔改：自训走路策略、自定义任务，Demo Day 当场路演。</span></td>
+              <td class="tt-exit">→ 助教池（每期约 20%）</td>
+            </tr>
+            <tr>
+              <td class="tt-rail"><b>TRACK C</b> · 落地</td>
+              <td>大二 · 研究生 · 职场</td>
+              <td>6 天 + 4 周陪跑</td>
+              <td><span class="tt-slogan">「把一只鸭子，做成一门生意」</span><span class="tt-sum">从产品到开城：课程包、讲师认证、城市合伙人通道，营后 4 周陪跑上路。</span></td>
+              <td class="tt-exit">→ 主讲（双城认证）→ 城市合伙人</td>
+            </tr>
+          </tbody>
+        </table>
       </div>
-      <div class="grid grid-3" data-stagger>
-        <article class="card track-card rv">
-          <span class="tk-tag">TRACK A · 兴趣</span>
-          <div class="tk-people">初三 – 高一 · 5 天日营</div>
-          <div class="tk-slogan">「亲手造出你的第一只 AI 机器人」</div>
-          <p class="post-sum">从零件盒到会走的鸭子，五天完成人生第一次完整复刻，点亮自己的鸭。</p>
-          <div class="tk-days">DURATION · 5 DAYS · DAY CAMP</div>
-        </article>
-        <article class="card track-card hot rv">
-          <span class="tk-tag">TRACK B · 工程</span>
-          <div class="tk-people">高二 – 大一 · 6 天</div>
-          <div class="tk-slogan">「从复刻到创造，只差一个寒假」</div>
-          <p class="post-sum">复刻之上加魔改：自训走路策略、自定义任务，Demo Day 当场路演。</p>
-          <div class="tk-days">DURATION · 6 DAYS</div>
-        </article>
-        <article class="card track-card rv">
-          <span class="tk-tag">TRACK C · 落地</span>
-          <div class="tk-people">大二 · 研究生 · 职场 · 6 天 + 4 周陪跑</div>
-          <div class="tk-slogan">「把一只鸭子，做成一门生意」</div>
-          <p class="post-sum">从产品到开城：课程包、讲师认证、城市合伙人通道，营后 4 周陪跑上路。</p>
-          <div class="tk-days">DURATION · 6 DAYS + 4 WEEKS</div>
-        </article>
-      </div>
+      <p class="table-foot">统一出口通道：<b>学员 → 助教（约 20%）→ 主讲（双城认证）→ 城市合伙人</b></p>
     </div>
   </section>
 
-  <!-- 5. 数据锚点条 -->
+  <!-- 3. 七级段位 · 单行表格 -->
   <section class="sec">
     <div class="wrap">
-      <div class="sec-head rv">
-        <div class="kicker">DATA ANCHORS</div>
-        <h2>数据锚点</h2>
-        <p class="desc">故事标【演绎】，数字没标——以下四个数字全部出自工程实测与公开记录。</p>
-      </div>
-      <div class="anchors rv">
-        <div class="anchor-item">
-          <div class="an">$2.6M/24h</div>
-          <div class="an-sub">官方首售 · ≈6500 台</div>
-        </div>
-        <div class="anchor-item">
-          <div class="an">149 项</div>
-          <div class="an-sub">本机验证测试全过</div>
-        </div>
-        <div class="anchor-item">
-          <div class="an">942 项</div>
-          <div class="an-sub">测试全开源 · Apache-2.0</div>
-        </div>
-        <div class="anchor-item">
-          <div class="an">−0.20→+13.74</div>
-          <div class="an-sub">自训实录 · CPU 18.4h</div>
+      <div class="sec-head rv"><span class="sec-no">§2</span><h2>七级段位</h2><i class="sec-rule"></i></div>
+      <p class="sec-desc">每级一段能讲出来的故事。段位永久有效，2027 寒假实装。</p>
+      <div class="card table-card">
+        <div class="table-wrap">
+          <table class="data-table rank-line">
+            <tbody><tr>
+              <td><span class="rk-lv">L1</span>青铜 · 见习造物者<span class="rk-exp">+100</span></td>
+              <td><span class="rk-lv">L2</span>白银 · 复刻工匠<span class="rk-exp">+200</span></td>
+              <td><span class="rk-lv">L3</span>黄金 · 魔改师<span class="rk-exp">+500</span></td>
+              <td><span class="rk-lv">L4</span>铂金 · 原创者<span class="rk-exp">+800</span></td>
+              <td><span class="rk-lv">L5</span>钻石 · 舰队队长<span class="rk-exp">+1000</span></td>
+              <td><span class="rk-lv">L6</span>王者 · 造物主<span class="rk-exp">+2000</span></td>
+              <td><span class="rk-lv">L7</span>传奇 · 具身智能行业领军人<span class="rk-exp">∞</span></td>
+            </tr></tbody>
+          </table>
         </div>
       </div>
+      <p class="dim-label">RANK LADDER · EXP 数值待实测调参</p>
     </div>
   </section>
 
-  <!-- 6. 七级段位预览 -->
+  <!-- 4. 术语速查 -->
   <section class="sec">
     <div class="wrap">
-      <div class="sec-head rv">
-        <div class="kicker">RANK SYSTEM</div>
-        <h2>七级段位</h2>
-        <p class="desc">每级一段能讲出来的故事。段位永久有效，2027 寒假实装。</p>
+      <div class="sec-head rv"><span class="sec-no">§3</span><h2>术语速查</h2><i class="sec-rule"></i></div>
+      <p class="sec-desc">黑话 → 一句话定义（公开安全版），详情见工程白皮书与内容库。</p>
+      <div class="card table-card">
+        <div class="table-wrap">
+          <table class="data-table gloss-table">
+            <thead><tr><th>术语</th><th>定义</th><th>术语</th><th>定义</th></tr></thead>
+            <tbody>
+              <tr><td class="g-term">一人一鸭</td><td class="g-def">运动总纲：每人亲手复刻一只开源机械鸭，复刻 → 魔改 → 原创三级进阶。</td><td class="g-term">复刻权</td><td class="g-def">图纸 / 代码 / 课程 / 账本全开源，clone 即拿走整套造物能力（区别于卖整机）。</td></tr>
+              <tr><td class="g-term">一核三翼</td><td class="g-def">开源内核是不变量（双仓 / 月度发版 / 社区即课程）；家长翼 · 校园翼 · 社会结构翼各按各的燃料转。</td><td class="g-term">段位</td><td class="g-def">七级成长体系：青铜 · 见习造物者 → 传奇 · 具身智能行业领军人，段位终身有效。</td></tr>
+              <tr><td class="g-term">五幕关卡</td><td class="g-def">新手村 → 工坊副本 → 竞技场 → 总决赛 → 开放世界（装鸭 → 魔改 → 仿真 / 区域赛 → 2028 总决赛 → 营后世界）。</td><td class="g-term">四道闸口</td><td class="g-def">扩张审批线：满班率、口碑、获客成本、转介绍四项过闸，才准开下一座城。</td></tr>
+              <tr><td class="g-term">复利设计</td><td class="g-def">判别三问：动作结束一周后留下什么 / 让下期更容易吗 / 十年后还在产生价值吗。</td><td class="g-term">五大复利资产</td><td class="g-def">人口 · 内容 · 数据 · 权威 · 网络——五类资产逐期变厚。</td></tr>
+              <tr><td class="g-term">反屏幕运动</td><td class="g-def">使命叙事：把孩子的手从屏幕里抢回来，放到真实世界里。</td><td class="g-term">会员编号制</td><td class="g-def">Duck #0001 起实体徽章，报名即发，编号永久保留。</td></tr>
+              <tr><td class="g-term">Chapter Kit</td><td class="g-def">自助开办包：把「加盟」重构为「开办章节」，压低开点成本。</td><td class="g-term">造物者节</td><td class="g-def">每年 1 月首战开幕日为运动诞生日：年度大促 + 限定款 + 限定徽章。</td></tr>
+              <tr><td class="g-term">sim-only</td><td class="g-def">主线只做仿真：真机门槛 ≈¥3500，一台笔记本即可完赛与学习。</td><td class="g-term">双城认证</td><td class="g-def">助教升主讲的考核：成都 + 杭州 两座首战城都认可才算数。</td></tr>
+            </tbody>
+          </table>
+        </div>
       </div>
-      <div class="rank-strip rv">
-        <span class="rank-chip"><b>L1</b>青铜·见习造物者</span><span class="rank-arrow">→</span>
-        <span class="rank-chip"><b>L2</b>白银·复刻工匠</span><span class="rank-arrow">→</span>
-        <span class="rank-chip"><b>L3</b>黄金·魔改师</span><span class="rank-arrow">→</span>
-        <span class="rank-chip"><b>L4</b>铂金·原创者</span><span class="rank-arrow">→</span>
-        <span class="rank-chip"><b>L5</b>钻石·舰队队长</span><span class="rank-arrow">→</span>
-        <span class="rank-chip"><b>L6</b>王者·造物主</span><span class="rank-arrow">→</span>
-        <span class="rank-chip"><b>L7</b>传奇·具身智能行业领军人</span>
-      </div>
-      <div class="dim-line rv"></div>
-      <p class="dim-label rv">RANK LADDER · EXP 数值待实测调参</p>
     </div>
   </section>
 
-  <!-- 7. 底部 CTA -->
+  <!-- 5. 底部 CTA（收敛条） -->
   <section class="end-cta">
     <div class="wrap">
-      <h2>第 001 只鸭，等你点亮。</h2>
-      <p>先花 4 分钟做段位测试，或直接报名三轨营——报名即发 Duck #0001 起实体徽章，编号永久保留。</p>
-      <div class="hero-cta">
-        <a class="btn btn-primary" href="#/test">开始段位测试</a>
-        <a class="btn btn-ghost" href="#/camp">报名三轨营</a>
+      <div class="sec-head rv"><span class="sec-no">§4</span><h2>第 001 只鸭，等你点亮。</h2><i class="sec-rule"></i></div>
+      <div class="end-row">
+        <p>先花 4 分钟做段位测试，或直接报名三轨营——报名即发 Duck #0001 起实体徽章，编号永久保留。</p>
+        <div class="hero-cta">
+          <a class="btn btn-primary" href="#/test">开始段位测试</a>
+          <a class="btn btn-ghost" href="#/camp">报名三轨营</a>
+        </div>
       </div>
     </div>
   </section>

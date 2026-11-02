@@ -777,14 +777,12 @@
     for (var i = 0; i < RANKS.length; i++) {
       var r = RANKS[i];
       rankRows +=
-        '<div class="card rank-card">' +
-          '<div class="rank-lv">' + esc(r[0]) + '</div>' +
-          '<div class="rank-main">' +
-            '<h3>' + esc(r[1]) + ' · ' + esc(r[2]) + '<span class="rk-tier">' + esc(r[0]) + '</span></h3>' +
-            '<div class="rk-crit">判据：' + esc(r[3]) + '</div>' +
-          '</div>' +
-          '<div class="rank-exp">EXP ' + esc(r[4]) + '</div>' +
-        '</div>';
+        '<tr class="rank-card">' +
+          '<td class="rk-lv">' + esc(r[0]) + '</td>' +
+          '<td><b>' + esc(r[1]) + '</b> · ' + esc(r[2]) + '</td>' +
+          '<td>' + esc(r[3]) + '</td>' +
+          '<td class="num">EXP ' + esc(r[4]) + '</td>' +
+        '</tr>';
     }
     var stageCards = '';
     for (var s = 0; s < STAGES.length; s++) {
@@ -811,7 +809,9 @@
           '七级段位，每级一段能讲出来的故事。段位永久有效；赛季排行榜每半年重置；个人和组织共用一条经验槽——帮别人升级就是给自己升级。') +
         '<div class="tune-note">EXP 数值待实测调参（方案注明，以书稿版为基准）</div>' +
         '<h3 class="list-title">七级段位</h3>' +
-        '<div class="rank-list">' + rankRows + '</div>' +
+        '<div class="rank-list"><div class="card table-card"><div class="table-wrap"><table class="data-table rank-table">' +
+          '<thead><tr><th>级</th><th>段位名</th><th>判据</th><th>EXP</th></tr></thead>' +
+          '<tbody>' + rankRows + '</tbody></table></div></div></div>' +
         '<div class="dim-line"></div>' +
         '<h3 class="list-title">五幕关卡</h3>' +
         '<div class="acts-row">' + stageCards + '</div>' +
@@ -878,21 +878,22 @@
   function viewMap() {
     var tl = '';
     for (var i = 0; i < ROADMAP.length; i++) {
-      tl += '<div class="tl-node">' +
-        '<div class="tl-when">' + esc(ROADMAP[i][0]) + '</div>' +
-        '<h3>' + esc(ROADMAP[i][1]) + '</h3>' +
-        '<p>' + esc(ROADMAP[i][2]) + '</p></div>';
+      tl += '<tr class="tl-node">' +
+        '<td class="tl-when">' + esc(ROADMAP[i][0]) + '</td>' +
+        '<td class="tl-mile"><b>' + esc(ROADMAP[i][1]) + '</b></td>' +
+        '<td>' + esc(ROADMAP[i][2]) + '</td></tr>';
     }
     var mottoHtml = '';
     for (var p = 0; p < PHASES.length; p++) {
       mottoHtml += '<div><b>[' + esc(PHASES[p][0]) + ']</b> 「' + esc(PHASES[p][1]) + '」</div>';
     }
-    var cityCards = '';
+    var cityRows = '';
     for (var c = 0; c < CITIES.length; c++) {
       var city = CITIES[c];
-      cityCards += '<div class="city-card' + (city[3] ? ' hold' : '') + '">' +
-        '<span class="c-phase">' + esc(city[0]) + '</span>' +
-        '<h3>' + esc(city[1]) + '</h3><p>' + esc(city[2]) + '</p></div>';
+      cityRows += '<tr>' +
+        '<td><span class="c-phase' + (city[3] ? ' hold' : '') + '">' + esc(city[0]) + '</span></td>' +
+        '<td><b>' + esc(city[1]) + '</b></td>' +
+        '<td>' + esc(city[2]) + '</td></tr>';
     }
     var fwNodes = '';
     for (var f = 0; f < FLYWHEEL.length; f++) {
@@ -922,11 +923,15 @@
         pageHead('BATTLE MAP', '作战图谱',
           '扩张不是勇气问题，是数据批准问题。先看台账，再看地图——光是数据点亮的，铺之前，先验电压。') +
         '<h3 class="list-title">运动路线图</h3>' +
-        '<div class="timeline">' + tl + '</div>' +
-        '<div class="phase-motto" style="margin-top:16px">' + mottoHtml + '</div>' +
+        '<div class="timeline"><div class="card table-card"><div class="table-wrap"><table class="data-table road-table">' +
+          '<thead><tr><th>时间</th><th>里程碑</th><th>说明</th></tr></thead>' +
+          '<tbody>' + tl + '</tbody></table></div></div></div>' +
+        '<div class="phase-motto" style="margin-top:12px">' + mottoHtml + '</div>' +
         '<div class="dim-line"></div>' +
         '<h3 class="list-title">城市网络</h3>' +
-        '<div class="city-grid">' + cityCards + '</div>' +
+        '<div class="card table-card"><div class="table-wrap"><table class="data-table city-table">' +
+          '<thead><tr><th>阶段</th><th>枢纽</th><th>窗口</th></tr></thead>' +
+          '<tbody>' + cityRows + '</tbody></table></div></div>' +
         '<p class="city-note">北京备注：v2 分区中北京归天津群承接（合规与成本最高）；若在北京开，预算×1.5、审批周期另加 1–2 个月。</p>' +
         '<div class="dim-line"></div>' +
         '<h3 class="list-title">社会化自动力飞轮</h3>' +
@@ -1051,19 +1056,19 @@
         '<div class="grid grid-3">' + trackCards + '</div>' +
         '<div class="dim-line"></div>' +
         '<h3 class="list-title">产品全景表</h3>' +
-        '<div class="card table-card"><div class="table-wrap"><table class="price-table">' +
+        '<div class="card table-card"><div class="table-wrap"><table class="price-table data-table">' +
           '<thead><tr><th>产品</th><th>人群</th><th>价格</th><th>交付</th></tr></thead>' +
           '<tbody>' + priceRows + '</tbody></table></div></div>' +
         '<div class="dim-line"></div>' +
         '<h3 class="list-title">社团 8 周课表</h3>' +
         '<p class="desc" style="margin-bottom:10px">每周 90 分钟，一学期把一只鸭从零件盒走到 Demo Day。每节课固定留下 1 条当堂产物——产物即档案。</p>' +
-        '<div class="card table-card"><div class="table-wrap"><table class="price-table" id="camp-week-table">' +
+        '<div class="card table-card"><div class="table-wrap"><table class="price-table data-table" id="camp-week-table">' +
           '<thead><tr><th>周</th><th>课</th><th>内容</th><th>当堂产物</th></tr></thead>' +
           '<tbody>' + weekRows + '</tbody></table></div></div>' +
         '<div class="dim-line"></div>' +
         '<h3 class="list-title">家长看到的成长档案</h3>' +
         '<p class="desc" style="margin-bottom:10px">三报节律 + 周五直播 + 结营成长册，全程微信群直达、零新软件——翻群即翻档案。</p>' +
-        '<div class="card table-card"><div class="table-wrap"><table class="price-table" id="report-table">' +
+        '<div class="card table-card"><div class="table-wrap"><table class="price-table data-table" id="report-table">' +
           '<thead><tr><th>时点</th><th>报</th><th>内容（实物）</th></tr></thead>' +
           '<tbody>' + reportRows + '</tbody></table></div></div>' +
         '<div class="report-extra">' +
@@ -1237,11 +1242,13 @@
       ['学校', '联培 · 微专业', '以联培模式与高校共建，开设微专业，把专业知识与产业结合起来，合力解决当下时代面临的社会问题。', '高校 · 职业院校'],
       ['个人', '共同分红', '有潜力有兴趣的同学、有能力承担讲师业务的专业人员——我们愿意与您共同分红，享受发展的红利。', '同学 · 专业人员']
     ];
-    var triHtml = '';
+    var triHead = '';
+    var triBody = '';
     var flyHtml = '';
     var i;
     for (i = 0; i < tri.length; i++) {
-      triHtml += '<div class="card"><div class="v-tag">' + esc(tri[i][0]) + '</div><h3>' + esc(tri[i][1]) + '</h3><p>' + esc(tri[i][2]) + '</p></div>';
+      triHead += '<th>' + esc(tri[i][0]) + '</th>';
+      triBody += '<td><h3>' + esc(tri[i][1]) + '</h3><p>' + esc(tri[i][2]) + '</p></td>';
     }
     for (i = 0; i < fly.length; i++) {
       flyHtml += '<div class="card"><div class="v-tag">' + esc(fly[i][0]) + '</div><h3>' + esc(fly[i][1]) + '</h3><p>' + esc(fly[i][2]) + '</p><div class="v-who">适合：' + esc(fly[i][3]) + '</div></div>';
@@ -1249,7 +1256,9 @@
     appView.innerHTML =
       '<section class="page"><div class="wrap">' +
         pageHead('FOUNDING MEMO', '愿景与合作', '这份筹备计划书是 MicroDuck 造物世界的起点。我们构建的是一套新体系，回应一个社会化问题：市场就业困难，AI 冲击就业。') +
-        '<div class="v-grid3">' + triHtml + '</div>' +
+        '<div class="card table-card"><div class="table-wrap"><table class="data-table tri-table">' +
+          '<thead><tr>' + triHead + '</tr></thead>' +
+          '<tbody><tr>' + triBody + '</tr></tbody></table></div></div>' +
         '<div class="dim-line"></div>' +
         '<div class="seal-block"><span class="seal-stamp">目标</span>' +
           '<h3>一个夏令营，一份可带走的证明</h3>' +
@@ -1289,7 +1298,7 @@
       '<section class="page"><div class="wrap">' +
         pageHead('WIN-WIN CONTRACT', '十方共赢',
           '每一方都先赢，我们才进场。合法性不能求，只能换——这张契约表就是全部交换结构。') +
-        '<div class="card table-card"><div class="table-wrap"><table class="swap-table">' +
+        '<div class="card table-card"><div class="table-wrap"><table class="swap-table data-table">' +
           '<thead><tr><th>参与方</th><th>付出</th><th>得到</th><th>共赢锚点</th></tr></thead>' +
           '<tbody>' + rows + '</tbody></table></div></div>' +
         '<div class="dim-line"></div>' +
@@ -1635,7 +1644,7 @@
         '</div>' +
         '<h3 class="list-title">表 · 功能对照</h3>' +
         '<div class="card table-card"><div class="table-wrap">' +
-          '<table class="admin">' +
+          '<table class="admin data-table">' +
             '<thead><tr><th>表</th><th>管什么</th><th>说明</th></tr></thead>' +
             '<tbody>' + rows + '</tbody>' +
           '</table>' +
