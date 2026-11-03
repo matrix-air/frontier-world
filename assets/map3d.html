@@ -60,9 +60,31 @@ body { padding: 18px 20px 26px; background: var(--background); color: var(--fore
   70% { opacity: .3; }
   100% { transform: scale(2.4); opacity: 0; }
 }
+/* ---- 点击锁定分区：0.3s 过渡（reduced-motion 下关闭过渡） ---- */
+.prov, .prov-in { transition: opacity .3s ease, filter .3s ease; }
+.prov { cursor: pointer; }
+#map-svg.locked .prov, #map-svg.locked .prov-in { opacity: .45; }
+#map-svg.locked .prov.lk-hot { opacity: 1; filter: brightness(1.15);
+  stroke: rgba(125,211,252,.9); stroke-width: 1.1; }
+#map-svg.locked .prov-in.lk-hot { opacity: 1; }
+.map-info { max-width: 860px; margin: 10px auto 0; font-size: 12px; color: var(--muted-foreground);
+  text-align: center; padding: 7px 12px; border: 1px dashed var(--border); border-radius: 8px;
+  transition: border-color .3s ease, color .3s ease;
+  display: flex; align-items: center; justify-content: center; gap: 6px; }
+.map-info .sw { width: 10px; height: 10px; border-radius: 3px; display: inline-block; flex: none; }
+.map-info.on { border-style: solid; border-color: rgba(125,211,252,.55); color: var(--foreground); }
+/* ---- 南海诸岛副图：常显规范件，不占图层开关；390px 缩至 110x140 靠右下 ---- */
+.sea-inset { position: absolute; right: 10px; bottom: 10px; width: 150px; height: 190px;
+  box-sizing: border-box; border: 1px solid rgba(125,211,252,.38); border-radius: 8px;
+  background: rgba(13,18,32,.78); box-shadow: 0 2px 12px rgba(0,0,0,.35);
+  pointer-events: none; overflow: hidden; }
+.sea-inset svg { display: block; width: 100%; height: 100%; }
+@media (max-width: 390px) { .sea-inset { right: 6px; bottom: 6px; width: 110px; height: 140px; } }
+.map-head .upd { margin-left: auto; font-size: 11px; color: #7dd3fc; opacity: .85; letter-spacing: .5px; }
 @media (prefers-reduced-motion: reduce) {
   .railflow { animation: none; }
   .hub-pulse { animation: none; opacity: 0; }
+  .prov, .prov-in, .map-info { transition: none; }
 }
 
 .legend { display: flex; flex-wrap: wrap; gap: 10px 18px; margin: 6px 0 2px; max-width: 860px; margin-left: auto; margin-right: auto; }
@@ -78,6 +100,7 @@ body { padding: 18px 20px 26px; background: var(--background); color: var(--fore
 <header class="map-head">
   <h1>全国分区作战地图</h1>
   <span class="sub">五大分区 · 首战 / P1 / P2 · 交通骨架为规划示意</span>
+  <span class="upd">V2 数据大屏 · 南海副图 / 干线光粒 / 枢纽时间窗 / 分区锁定</span>
 </header>
 
 <div class="map-sec-title">2D · 全国分区作战图（可切图层 / 悬浮看分区）</div>
@@ -92,6 +115,7 @@ body { padding: 18px 20px 26px; background: var(--background); color: var(--fore
 <svg id="map-svg" viewBox="0 0 760 664" role="img" aria-label="中国分区地图，七个中心城市"></svg>
 <svg id="trans-svg" viewBox="0 0 760 664" aria-hidden="true"></svg>
 </div></div>
+<div id="map-info" class="map-info">点击省份锁定分区 · 悬浮查看分区详情</div>
 <div id="map-legend" class="legend"></div>
 <p class="footnote">底图来源：DataV.GeoAtlas 省界（简化）。福建归广州群（P1）、河南归太原方向（P2）；港澳台暂未规划。交通线为骨架级示意（高铁按主要经停站连线），非精确线路。</p>
 
@@ -113,13 +137,13 @@ const PROV = {
   "河南省":3,"台湾省":-1,"香港特别行政区":-1,"澳门特别行政区":-1
 };
 const HUBS = [
-  { n: "成都", lon: 104.06, lat: 30.57, tag: "首战", g: 0 },
-  { n: "杭州", lon: 120.15, lat: 30.27, tag: "首战", g: 2 },
-  { n: "广州", lon: 113.26, lat: 23.13, tag: "P1", g: 1 },
-  { n: "天津", lon: 117.20, lat: 39.08, tag: "P1", g: 3 },
-  { n: "西安", lon: 108.94, lat: 34.34, tag: "P2", g: 4 },
-  { n: "太原", lon: 112.55, lat: 37.87, tag: "P2", g: 3 },
-  { n: "青岛", lon: 120.38, lat: 36.06, tag: "P1-P2", g: 3 }
+  { n: "成都", lon: 104.06, lat: 30.57, tag: "首战", g: 0, win: "2027 寒 · 双营" },
+  { n: "杭州", lon: 120.15, lat: 30.27, tag: "首战", g: 2, win: "2027 寒 · 双营" },
+  { n: "广州", lon: 113.26, lat: 23.13, tag: "P1", g: 1, win: "2027 暑" },
+  { n: "天津", lon: 117.20, lat: 39.08, tag: "P1", g: 3, win: "2027 暑" },
+  { n: "西安", lon: 108.94, lat: 34.34, tag: "P2", g: 4, win: "2027 秋" },
+  { n: "太原", lon: 112.55, lat: 37.87, tag: "P2", g: 3, win: "2027 秋" },
+  { n: "青岛", lon: 120.38, lat: 36.06, tag: "P1-P2", g: 3, win: "暂缓观察" }
 ];
 const RAILS = [
   { name: "京广高铁", pts: [[116.41,39.90],[114.51,38.04],[113.63,34.75],[114.31,30.59],[112.94,28.23],[113.26,23.13]] },
@@ -163,7 +187,24 @@ const GEO = window.CHINA_GEO;
 (function () {
   const svg = d3.select("#map-svg");
   const W = 760, H = 620;           /* 制图区仍为 760x620（y 10..610），viewBox 底部加厚到 664 容纳挤出+阴影 */
-  const mainland = GEO.features.filter(f => f.properties.adcode !== "100000_JD");
+  /* 主图要素裁剪：JD（九段线/南海诸岛散件）退出主图归副图；海南只留本岛
+     （poly bbox 与本岛核心框 [109,110.5]x[18.6,19.9] 相交者），远海岛礁不再南向溢出画布 */
+  function hainanMainOnly(f) {
+    return f.geometry.coordinates.filter(function (poly) {
+      let mnx = 999, mxx = -999, mny = 999, mxy = -999;
+      poly[0].forEach(function (p) {
+        mnx = Math.min(mnx, p[0]); mxx = Math.max(mxx, p[0]);
+        mny = Math.min(mny, p[1]); mxy = Math.max(mxy, p[1]);
+      });
+      return mxx > 109 && mnx < 110.5 && mxy > 18.6 && mny < 19.9;
+    });
+  }
+  const FEATS = GEO.features.filter(f => f.properties.adcode !== "100000_JD").map(function (f) {
+    if (f.properties.adcode === 460000) {
+      return Object.assign({}, f, { geometry: { type: "MultiPolygon", coordinates: hainanMainOnly(f) } });
+    }
+    return f;
+  });
   const merc = d => Math.log(Math.tan(Math.PI / 4 + d * Math.PI / 360));
   const L0 = 73, L1 = 135, B0 = 18, B1 = 53.5;
   const MSPAN = merc(B1) - merc(B0);
@@ -200,7 +241,7 @@ const GEO = window.CHINA_GEO;
   const NARROW = window.matchMedia && window.matchMedia("(max-width: 390px)").matches;
   const EXT_N = NARROW ? 4 : 8;
 
-  const provD = GEO.features.map(f => path(f));
+  const provD = FEATS.map(f => path(f));
 
   /* ================= defs：渐变 / 滤镜 / 复用母版 / 裁剪 ================= */
   const defs = svg.append("defs");
@@ -256,6 +297,13 @@ const GEO = window.CHINA_GEO;
       .attr("r", (0.6 + rnd() * 0.8).toFixed(2))
       .attr("fill", "#ffffff").attr("opacity", (0.08 + rnd() * 0.17).toFixed(3));
   }
+  /* 青蓝 ambient 光晕：slab 外一圈（径向渐变椭圆，中心 .12 → 0） */
+  const amb = defs.append("radialGradient").attr("id", "ambient-glow");
+  amb.append("stop").attr("offset", "0%").attr("stop-color", "#22d3ee").attr("stop-opacity", 0.12);
+  amb.append("stop").attr("offset", "62%").attr("stop-color", "#22d3ee").attr("stop-opacity", 0.05);
+  amb.append("stop").attr("offset", "100%").attr("stop-color", "#22d3ee").attr("stop-opacity", 0);
+  bg.append("ellipse").attr("cx", 380).attr("cy", 318).attr("rx", 384).attr("ry", 314)
+    .attr("fill", "url(#ambient-glow)");
 
   /* ================= 挤出层：8 层（窄屏 4 层）板块厚度 ================= */
   const ext = svg.append("g").attr("id", "map-extrude");
@@ -273,7 +321,7 @@ const GEO = window.CHINA_GEO;
 
   /* ================= 顶面：分区渐变 + 双描边 + 光泽 + 落影 ================= */
   const top = svg.append("g").attr("id", "map-top").attr("filter", "url(#top-shadow)");
-  top.selectAll("path.prov").data(GEO.features).join("path")
+  top.selectAll("path.prov").data(FEATS).join("path")
     .attr("class", "prov")
     .attr("d", d => path(d))
     .attr("fill", d => {
@@ -293,7 +341,7 @@ const GEO = window.CHINA_GEO;
       return g.p + "·" + g.n + "：" + g.cov;
     });
   /* 内层亮描边（叠在填充之上，不吃指针） */
-  top.selectAll("path.prov-in").data(GEO.features).join("path")
+  top.selectAll("path.prov-in").data(FEATS).join("path")
     .attr("class", "prov-in")
     .attr("d", d => path(d))
     .attr("fill", "none")
@@ -320,6 +368,13 @@ const GEO = window.CHINA_GEO;
       .attr("cx", p[0]).attr("cy", p[1]).attr("r", 5)
       .attr("fill", "none").attr("stroke", col).attr("stroke-width", 1.5)
       .style("animation-delay", (-(i * 0.37) % 2.6).toFixed(2) + "s");
+    /* 首战城（成都/杭州）金色呼吸环：分区色脉冲之外再叠一圈 #fcd34d */
+    if (h.tag === "首战") {
+      hubG.append("circle").attr("class", "hub-pulse gold-pulse")
+        .attr("cx", p[0]).attr("cy", p[1]).attr("r", 7)
+        .attr("fill", "none").attr("stroke", "#fcd34d").attr("stroke-width", 1.3)
+        .style("animation-delay", (-(i * 0.53 + 0.4) % 2.6).toFixed(2) + "s");
+    }
   });
   svg.selectAll("circle.hub").data(HUBS).join("circle")
     .attr("class", "hub")
@@ -329,23 +384,33 @@ const GEO = window.CHINA_GEO;
     .attr("fill", "var(--foreground)")
     .attr("stroke", "var(--background)")
     .attr("stroke-width", 1.5)
-    .attr("data-tooltip", d => d.n + " · " + d.tag);
-  /* 芯片标签：圆角底 rect（#0d1220 80% + 1px 分区色边）+ 文本 */
+    .attr("data-tooltip", d => d.n + " · " + d.tag + " · " + d.win);
+  /* 芯片标签：两行 = 城市·阶段（12px 600）+ 时间窗（10px 等宽小字），底色不变 */
+  const MONO = "ui-monospace, SFMono-Regular, Menlo, monospace";
   HUBS.forEach((h, i) => {
     const p = hubPt(h), col = HEX[h.g];
     const label = h.n + "·" + h.tag;
-    const tw = meas.measureText(label).width;
+    meas.font = "600 12px -apple-system, 'PingFang SC', sans-serif";
+    const tw1 = meas.measureText(label).width;
+    meas.font = "500 10px " + MONO;
+    const tw2 = meas.measureText(h.win).width;
+    const cw = Math.max(tw1, tw2) + 12;
     const cg = svg.append("g").attr("class", "hub-chip");
     cg.append("rect")
-      .attr("x", p[0] + 8).attr("y", p[1] - 10.5)
-      .attr("width", (tw + 12).toFixed(1)).attr("height", 19).attr("rx", 5)
+      .attr("x", p[0] + 8).attr("y", p[1] - 16)
+      .attr("width", cw.toFixed(1)).attr("height", 32).attr("rx", 6)
       .attr("fill", "rgba(13,18,32,0.8)")
       .attr("stroke", col).attr("stroke-opacity", 0.6).attr("stroke-width", 1);
     cg.append("text").attr("class", "hublab")
-      .attr("x", p[0] + 14).attr("y", p[1] + 4)
+      .attr("x", p[0] + 14).attr("y", p[1] - 3)
       .text(label)
       .attr("font-size", 12).attr("font-weight", 600)
       .attr("fill", "var(--foreground)");
+    cg.append("text").attr("class", "hubwin")
+      .attr("x", p[0] + 14).attr("y", p[1] + 10)
+      .text(h.win)
+      .attr("font-size", 10).attr("font-family", MONO)
+      .attr("fill", "var(--muted-foreground)");
   });
 
   /* ================= 图例 ================= */
@@ -362,6 +427,7 @@ const GEO = window.CHINA_GEO;
 
   /* ================= 交通层（trans-svg 浮动平面） ================= */
   const tsvg = d3.select("#trans-svg");
+  const REDUCED = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const line = d3.line();
   const drawL = pts => line(pts.map(proj));
   const hasPt = (pts, c) => pts.some(p => p[0] === c[0] && p[1] === c[1]);
@@ -407,6 +473,30 @@ const GEO = window.CHINA_GEO;
         .style("--rd", dur.toFixed(2) + "s")
         .style("animation-delay", (-(railRnd() * dur)).toFixed(2) + "s");
     });
+  /* 干线流动光粒：每线 2 颗（r1.8 #bae6fd），SMIL animateMotion 沿路径循环，
+     定速 ~90px/s（时长按路径长换算并钳制 6–10s），begin 按线序 + 半周期错峰；
+     reduced-motion 时静态化（置于路径 1/3 与 2/3 处，不创建 animateMotion） */
+  const railNodes = tsvg.selectAll("path.rail").nodes();
+  const dotG = tsvg.append("g").attr("class", "rail-dots");
+  RAILS.forEach(function (r, i) {
+    const dstr = drawL(r.pts);
+    const len = railNodes[i].getTotalLength();
+    const dur = Math.min(10, Math.max(6, len / 90));
+    for (let k = 0; k < 2; k++) {
+      const c = dotG.append("circle").attr("class", "raildot")
+        .attr("r", 1.8).attr("fill", "#bae6fd").attr("fill-opacity", 0.95);
+      if (!REDUCED) {
+        c.append("animateMotion")
+          .attr("dur", dur.toFixed(2) + "s")
+          .attr("begin", (-(i * 1.1 + k * dur / 2)).toFixed(2) + "s")
+          .attr("repeatCount", "indefinite")
+          .attr("path", dstr);
+      } else {
+        const pt = railNodes[i].getPointAtLength(len * (k === 0 ? 1 : 2) / 3);
+        c.attr("cx", pt.x.toFixed(1)).attr("cy", pt.y.toFixed(1));
+      }
+    }
+  });
   /* 经停站：各干线内部顶点（非首末端点），归 ly-rail 图层 */
   const STOPS = [];
   RAILS.forEach(r => r.pts.slice(1, -1).forEach(p => STOPS.push(p)));
@@ -430,7 +520,6 @@ const GEO = window.CHINA_GEO;
     .attr("data-tooltip", d => "国道：" + d.name);
   /* 航空走廊：弧高按弦长比例换算（普通 0.16→0.10 随距离衰减，首战专线固定 0.18）；
      描边用沿弦向的 userSpaceOnUse 渐变（两端淡出→中段 85%）；tooltip 改「在飞：XX—YY」 */
-  const REDUCED = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   const FG = FLIGHTS.map(f => {
     const a = proj(f.pts[0]), b = proj(f.pts[1]);
     return { a: a, b: b, dist: Math.hypot(b[0] - a[0], b[1] - a[1]) };
@@ -503,7 +592,9 @@ const GEO = window.CHINA_GEO;
   /* 首战专线芯片标签：金色，置于中弧顶 */
   FLIGHTS.forEach((f, i) => {
     if (!f.gold) return;
-    const p = apex(i), label = "首战专线", tw = meas.measureText(label).width;
+    const p = apex(i), label = "首战专线";
+    meas.font = "600 11px -apple-system, 'PingFang SC', sans-serif";
+    const tw = meas.measureText(label).width;
     const cg = tsvg.append("g").attr("class", "flight-chip");
     cg.append("rect")
       .attr("x", p[0] + 6).attr("y", p[1] - 9)
@@ -534,10 +625,80 @@ const GEO = window.CHINA_GEO;
     .attr("r", 1.4)
     .attr("fill", "var(--foreground)");
 
+  /* ================= 南海诸岛副图（中国地图规范件，常显不占图层开关） =================
+     右下角 150×190 框（390px 缩至 110×140）：粤/桂/琼/滇 + 台湾缩微轮廓 +
+     九段线风格断续弧段（取底图 JD 散件 10 段，各取环上相距最远两点绘微弧）+
+     主要岛点 + 「南海诸岛」小字。主图远海岛礁已裁（见 FEATS），岛礁归此副图。 */
+  (function buildInset() {
+    const NAMES = ["广东省", "广西壮族自治区", "海南省", "云南省", "台湾省"];
+    const insWrap = d3.select("#map3d").append("div")
+      .attr("class", "sea-inset").attr("id", "sea-inset");
+    const insSvg = insWrap.append("svg").attr("viewBox", "0 0 148 188").attr("aria-hidden", "true");
+    /* 固定制图范围：滇西 97.5 → 台湾东侧 124.6，北至滇北 29.2，南至曾母暗沙以南海域 3.2 */
+    const E = { x0: 97.0, x1: 125.0, y0: 3.2, y1: 29.6 };
+    /* mercator 纵向换算：返回「度等价」值（×180/π），与经度同单位才可共用以同一 k 缩放 */
+    const imerc = d => (180 / Math.PI) * Math.log(Math.tan(Math.PI / 4 + d * Math.PI / 360));
+    const iw = 148, ih = 188, padX = 5, labH = 16, padB = 4;
+    const spanX = E.x1 - E.x0;
+    const spanY = imerc(E.y1) - imerc(E.y0);          /* mercator 纵向弧度域 */
+    const k = Math.min((iw - 2 * padX) / spanX, (ih - labH - padB) / spanY);
+    const ox = padX + ((iw - 2 * padX) - spanX * k) / 2;
+    const oy = labH + ((ih - labH - padB) - spanY * k) / 2;
+    const iproj = p => [ox + (p[0] - E.x0) * k, oy + (imerc(E.y1) - imerc(p[1])) * k];
+    const ipath = d3.geoPath(d3.geoTransform({
+      point: function (lon, lat) { const q = iproj([lon, lat]); this.stream.point(q[0], q[1]); }
+    }));
+    const gIns = insSvg.append("g");
+    NAMES.forEach(function (n) {
+      const f = GEO.features.find(x => x.properties.name === n);
+      if (!f) return;
+      const gi = PROV[n];
+      gIns.append("path").attr("d", ipath(f))
+        .style("fill", gi !== undefined && gi >= 0 ? "var(" + series[gi] + ")" : "var(--muted)")
+        .style("fill-opacity", 0.5)
+        .attr("stroke", "rgba(232,234,240,.5)").attr("stroke-width", 0.5);
+    });
+    /* 九段线：底图 JD 散件即 10 段细长 sliver，取环上相距最远两点 → 15% 弦长微弧 */
+    const jd = GEO.features.find(x => x.properties.adcode === "100000_JD" && !x.properties.name);
+    if (jd) {
+      jd.geometry.coordinates.forEach(function (poly) {
+        const ring = poly[0], a = ring[0];
+        let b = ring[0], bd = 0;
+        ring.forEach(function (p) {
+          const dd = Math.hypot(p[0] - a[0], p[1] - a[1]);
+          if (dd > bd) { bd = dd; b = p; }
+        });
+        const pa = iproj(a), pb = iproj(b);
+        const mx = (pa[0] + pb[0]) / 2, my = (pa[1] + pb[1]) / 2;
+        const dx = pb[0] - pa[0], dy = pb[1] - pa[1];
+        const L = Math.hypot(dx, dy) || 1;
+        gIns.append("path")
+          .attr("d", "M" + pa[0].toFixed(1) + "," + pa[1].toFixed(1)
+            + " Q" + (mx - dy * 0.15).toFixed(1) + "," + (my + dx * 0.15).toFixed(1)
+            + " " + pb[0].toFixed(1) + "," + pb[1].toFixed(1))
+          .attr("fill", "none")
+          .attr("stroke", "rgba(170,180,196,.95)")
+          .attr("stroke-width", 1.1).attr("stroke-linecap", "round");
+      });
+    }
+    /* 主要岛点：东沙 / 永兴岛（西沙） / 黄岩岛 / 渚碧礁 / 美济礁 / 曾母暗沙 */
+    [[116.75, 20.68], [112.34, 16.83], [118.25, 15.15],
+     [114.06, 10.90], [115.53, 9.90], [112.60, 3.95]].forEach(function (p) {
+      const q = iproj(p);
+      gIns.append("circle").attr("cx", q[0].toFixed(1)).attr("cy", q[1].toFixed(1))
+        .attr("r", 1.5).attr("fill", "var(--foreground)").attr("fill-opacity", 0.9);
+    });
+    gIns.append("text").attr("x", iw / 2 + 1.5).attr("y", 12)
+      .attr("text-anchor", "middle")
+      .text("南海诸岛")
+      .attr("font-size", 10).attr("letter-spacing", 3)
+      .attr("fill", "var(--muted-foreground)");
+  })();
+
   /* ================= 图层开关 / 倾斜视角 / 状态持久化 ================= */
   const tsel = s => document.querySelector(s);
   const layers = [
-    ["ly-rail", "path.rail, path.railglow, path.railflow, circle.railstop"],
+    ["ly-rail", "path.rail, path.railglow, path.railflow, circle.railstop, circle.raildot"],
     ["ly-road", "path.road"],
     ["ly-flight", "path.flight, .plane, .flight-chip"],
     ["ly-city", "g.city"]
@@ -576,13 +737,12 @@ const GEO = window.CHINA_GEO;
   function focusRails(fn) {
     tsvg.selectAll("path.rail").attr("stroke-opacity", d => fn(d) ? 1 : 0.15)
       .attr("stroke-width", d => fn(d) ? 2.4 : 1.2);
-    tsvg.selectAll("path.railglow, path.railflow")
+    tsvg.selectAll("path.railglow, path.railflow, circle.raildot")
       .attr("opacity", d => fn(d) ? null : 0.08);
   }
   function clearF() {
     tsvg.selectAll("path.rail").attr("stroke-opacity", 0.8).attr("stroke-width", 1.5);
-    tsvg.selectAll("path.railglow").attr("opacity", null);
-    tsvg.selectAll("path.railflow").attr("opacity", null);
+    tsvg.selectAll("path.railglow, path.railflow, circle.raildot").attr("opacity", null);
   }
   tsvg.selectAll("path.rail")
     .on("mouseover", (e, d) => focusRails(x => x === d))
@@ -593,6 +753,51 @@ const GEO = window.CHINA_GEO;
   tsvg.selectAll("g.city")
     .on("mouseover", (e, d) => focusRails(r => hasPt(r.pts, d.pts[0])))
     .on("mouseout", clearF);
+
+  /* ================= 点击锁定分区（再点同区或空白解除；信息卡固定显示） ================= */
+  const svgSel = d3.select("#map-svg");
+  const infoCard = document.getElementById("map-info");
+  let lockedG = null;
+  function renderInfo(gi) {
+    if (gi === null || gi === undefined) {
+      infoCard.classList.remove("on");
+      infoCard.textContent = "点击省份锁定分区 · 悬浮查看分区详情";
+    } else {
+      const g = GROUPS[gi];
+      infoCard.classList.add("on");
+      infoCard.innerHTML = '<span class="sw" style="background:var(' + series[gi] + ')"></span>'
+        + "已锁定：" + g.p + "·" + g.n + "（" + g.cov + "）— 再点同区或空白解除";
+    }
+  }
+  function applyLock() {
+    svgSel.classed("locked", lockedG !== null);
+    svgSel.selectAll("path.prov, path.prov-in").classed("lk-hot", function (d) {
+      const gi = PROV[d.properties.name];
+      return lockedG !== null && gi === lockedG;
+    });
+    renderInfo(lockedG);
+  }
+  svgSel.selectAll("path.prov")
+    .on("click", function (e, d) {
+      const gi = PROV[d.properties.name];
+      if (gi === undefined || gi < 0) {          /* 未规划省视同空白：解除锁定 */
+        if (lockedG !== null) { lockedG = null; applyLock(); }
+        return;
+      }
+      lockedG = (lockedG === gi) ? null : gi;    /* 再点同区解除，点他区切换 */
+      applyLock();
+      e.stopPropagation();
+    })
+    .on("mouseover", function (e, d) {           /* 未锁定时信息卡预览悬浮分区 */
+      if (lockedG === null) {
+        const gi = PROV[d.properties.name];
+        if (gi !== undefined && gi >= 0) renderInfo(gi);
+      }
+    })
+    .on("mouseout", function () { if (lockedG === null) renderInfo(null); });
+  svgSel.on("click", function () {               /* 点空白（海域/舞台）解除 */
+    if (lockedG !== null) { lockedG = null; applyLock(); }
+  });
 })();
 </script>
 </body>
